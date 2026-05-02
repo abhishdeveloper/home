@@ -180,14 +180,14 @@ class AuthController extends Controller {
             Session::set('user_name', $user->name);
             Session::set('user_role_id', $user->role_id);
             header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'redirect' => URL_ROOT . '/pages/index']);
+            echo json_encode(['success' => true, 'redirect' => URL_ROOT . '/onboarding']);
             exit;
         }
         Session::set('user_id', $user->id);
         Session::set('user_email', $user->email);
         Session::set('user_name', $user->name);
         Session::set('user_role_id', $user->role_id);
-        header('Location: ' . URL_ROOT . '/pages/index');
+        header('Location: ' . URL_ROOT . '/onboarding');
         exit;
     }
 

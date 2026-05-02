@@ -1,0 +1,99 @@
+<?php
+
+class ClinicDashboardController extends Controller {
+    private $clinicModel;
+
+    public function __construct() {
+        Session::init();
+
+        if (!Session::get('user_id') || Session::get('user_role_id') != 2) {
+            header('Location: ' . URL_ROOT . '/auth/login');
+            exit;
+        }
+
+        $this->clinicModel = $this->model('ClinicModel');
+
+        // Ensure they have finished onboarding
+        if (!$this->clinicModel->getProfileByUserId(Session::get('user_id'))) {
+            header('Location: ' . URL_ROOT . '/onboarding/clinic');
+            exit;
+        }
+    }
+
+    public function index() {
+        $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+        $pages = $this->clinicModel->getPages($profile->id);
+
+        $data = [
+            'profile' => $profile,
+            'pages' => $pages
+        ];
+
+        $this->view('clinic/dashboard', $data);
+    }
+
+    public function togglePublish() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+            $newStatus = $profile->is_published ? 0 : 1;
+
+            $this->clinicModel->setPublished(Session::get('user_id'), $newStatus);
+
+            header('Location: ' . URL_ROOT . '/clinicDashboard');
+            exit;
+        }
+    }
+
+    public function createPage() {
+        $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+
+        $data = [
+            'title' => '',
+            'slug' => '',
+            'content' => '',
+            'is_home' => 0,
+            'status' => 'draft',
+            'error' => ''
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data['title'] = trim($_POST['title']);
+            $data['slug'] = trim(strtolower(preg_replace('/[^a-zA-Z0-9-]/', '-', $_POST['slug'])));
+            $data['content'] = $_POST['content']; // HTML content from WYSIWYG
+            $data['is_home'] = isset($_POST['is_home']) ? 1 : 0;
+            $data['status'] = $_POST['status'];
+
+            if (empty($data['title']) || empty($data['slug'])) {
+                $data['error'] = 'Title and Slug are required.';
+            } else {
+                $pageData = [
+                    'clinic_id' => $profile->id,
+                    'title' => $data['title'],
+                    'slug' => $data['slug'],
+                    'content' => $data['content'],
+                    'is_home' => $data['is_home'],
+                    'status' => $data['status']
+                ];
+
+                if ($this->clinicModel->createPage($pageData)) {
+                    header('Location: ' . URL_ROOT . '/clinicDashboard');
+                    exit;
+                } else {
+                    $data['error'] = 'Failed to create page. Slug must be unique per clinic.';
+                }
+            }
+        }
+
+        $this->view('clinic/createPage', $data);
+    }
+}
