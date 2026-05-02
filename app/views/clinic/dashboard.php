@@ -16,14 +16,22 @@
         .table th, .table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
 
         .metric-cards { display: flex; gap: 15px; margin-bottom: 20px; }
-        .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
+        .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; min-width: 200px;}
         .metric-card h3 { margin: 0; font-size: 2em; color: #007bff; }
         .metric-card p { margin: 5px 0 0 0; color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
+
+        .table-responsive { overflow-x: auto; width: 100%; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; gap: 15px; }
+            .header nav { justify-content: center; }
+            .metric-cards { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; background: #fff; padding: 20px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <img src="<?= !empty($data['user']->avatar_url) ? URL_ROOT . Security::escape($data['user']->avatar_url) : 'https://via.placeholder.com/60' ?>" alt="Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
                 <div>
@@ -80,43 +88,45 @@
         </div>
 
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Your Pages</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Your Pages</h3>
                 <a href="<?= URL_ROOT ?>/clinicDashboard/createPage" class="btn btn-success">+ Add New Page</a>
             </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>URL Slug</th>
-                        <th>Status</th>
-                        <th>Type</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($data['pages'])): ?>
-                        <tr><td colspan="5">No pages created yet. Create a homepage to get started!</td></tr>
-                    <?php else: ?>
-                        <?php foreach ($data['pages'] as $page): ?>
-                            <tr>
-                                <td><?= Security::escape($page->title) ?></td>
-                                <td>/<?= Security::escape($page->slug) ?></td>
-                                <td><?= ucfirst(Security::escape($page->status)) ?></td>
-                                <td><?= $page->is_home ? 'Homepage' : 'Inner Page' ?></td>
-                                <td>
-                                    <a href="<?= URL_ROOT ?>/clinicDashboard/editPage/<?= $page->id ?>" class="btn btn-warning" style="padding: 5px 10px;">Edit</a>
-                                    <form action="<?= URL_ROOT ?>/clinicDashboard/deletePage/<?= $page->id ?>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this page?');">
-                                        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
-                                        <button type="submit" class="btn btn-danger" style="padding: 5px 10px; background: #dc3545;">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>URL Slug</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($data['pages'])): ?>
+                            <tr><td colspan="5">No pages created yet. Create a homepage to get started!</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($data['pages'] as $page): ?>
+                                <tr>
+                                    <td><?= Security::escape($page->title) ?></td>
+                                    <td>/<?= Security::escape($page->slug) ?></td>
+                                    <td><?= ucfirst(Security::escape($page->status)) ?></td>
+                                    <td><?= $page->is_home ? 'Homepage' : 'Inner Page' ?></td>
+                                    <td style="min-width: 150px;">
+                                        <a href="<?= URL_ROOT ?>/clinicDashboard/editPage/<?= $page->id ?>" class="btn btn-warning" style="padding: 5px 10px;">Edit</a>
+                                        <form action="<?= URL_ROOT ?>/clinicDashboard/deletePage/<?= $page->id ?>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this page?');">
+                                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                                            <button type="submit" class="btn btn-danger" style="padding: 5px 10px; background: #dc3545;">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

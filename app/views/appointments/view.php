@@ -30,18 +30,29 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <style>
+            .appt-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+            .appt-layout { display: flex; gap: 20px; flex-wrap: wrap; }
+            .col-left { flex: 2; min-width: 300px; }
+            .col-right { flex: 1; min-width: 250px; background: #fff; border: 1px solid #ddd; border-radius: 5px; padding: 15px; }
+            @media (max-width: 768px) {
+                .appt-header { flex-direction: column; text-align: center; }
+                .appt-header > div { text-align: center !important; }
+            }
+        </style>
+
+        <div class="appt-header">
             <div>
-                <h2>Appointment on <?= date('M d, Y', strtotime($data['appointment']->appointment_date)) ?> at <?= date('h:i A', strtotime($data['appointment']->appointment_time)) ?></h2>
-                <p>
+                <h2 style="margin: 0 0 5px 0;">Appointment on <?= date('M d, Y', strtotime($data['appointment']->appointment_date)) ?> at <?= date('h:i A', strtotime($data['appointment']->appointment_time)) ?></h2>
+                <p style="margin: 0;">
                     <strong>Patient:</strong> <?= Security::escape($data['appointment']->patient_name) ?> |
                     <strong>Clinic:</strong> <?= Security::escape($data['appointment']->clinic_name) ?>
                 </p>
                 <div style="margin-top: 10px;">
-                    <?php if (Session::get('user_role_id') == 2): // Doctor viewing ?>
-                        <a href="tel:<?= Security::escape($data['appointment']->patient_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em;">📞 Call Patient (<?= Security::escape($data['appointment']->patient_phone) ?>)</a>
-                    <?php elseif (Session::get('user_role_id') == 3): // Patient viewing ?>
-                        <a href="tel:<?= Security::escape($data['appointment']->clinic_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em;">📞 Call Clinic (<?= Security::escape($data['appointment']->clinic_phone) ?>)</a>
+                    <?php if (Session::get('user_role_id') == 2): ?>
+                        <a href="tel:<?= Security::escape($data['appointment']->patient_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em; display: inline-block;">📞 Call Patient (<?= Security::escape($data['appointment']->patient_phone) ?>)</a>
+                    <?php elseif (Session::get('user_role_id') == 3): ?>
+                        <a href="tel:<?= Security::escape($data['appointment']->clinic_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em; display: inline-block;">📞 Call Clinic (<?= Security::escape($data['appointment']->clinic_phone) ?>)</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -52,10 +63,10 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div class="appt-layout">
 
         <!-- Left Column: Chat & Video -->
-        <div style="flex: 2; min-width: 400px;">
+        <div class="col-left">
         <?php if ($data['appointment']->status == 'approved'): ?>
             <div style="background: #e2e3e5; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;" id="video_section">
                 <h3>Video Consultation</h3>
@@ -218,7 +229,7 @@
         </div> <!-- End Left Column -->
 
         <!-- Right Column: Medical Attachments & Notes -->
-        <div style="flex: 1; min-width: 300px; background: #fff; border: 1px solid #ddd; border-radius: 5px; padding: 15px;">
+        <div class="col-right">
             <h3 style="margin-top: 0; border-bottom: 2px solid #17a2b8; padding-bottom: 5px;">Medical Records & Attachments</h3>
             <p style="font-size: 0.9em; color: #666;">Upload past prescriptions, lab reports, or images relevant to this consultation.</p>
 

@@ -24,32 +24,34 @@
             <a href="<?= URL_ROOT ?>/directory" class="btn" style="background:#6c757d;">Book New Appointment</a>
         </div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date & Time</th>
-                    <th>Clinic/Doctor</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($data['appointments'])): ?>
-                    <tr><td colspan="4">No appointments found.</td></tr>
-                <?php else: ?>
-                    <?php foreach ($data['appointments'] as $appt): ?>
-                        <tr>
-                            <td><?= date('M d, Y', strtotime($appt->appointment_date)) ?> at <?= date('h:i A', strtotime($appt->appointment_time)) ?></td>
-                            <td><?= Security::escape($appt->clinic_name) ?></td>
-                            <td><span class="status <?= $appt->status ?>"><?= ucfirst($appt->status) ?></span></td>
-                            <td>
-                                <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn">View Details</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <div style="overflow-x: auto; width: 100%;">
+            <table class="table" style="min-width: 500px;">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Clinic/Doctor</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($data['appointments'])): ?>
+                        <tr><td colspan="4">No appointments found.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($data['appointments'] as $appt): ?>
+                            <tr>
+                                <td><?= date('M d, Y', strtotime($appt->appointment_date)) ?><br><span style="color:#666; font-size:0.9em;"><?= date('h:i A', strtotime($appt->appointment_time)) ?></span></td>
+                                <td><?= Security::escape($appt->clinic_name) ?></td>
+                                <td><span class="status <?= $appt->status ?>"><?= ucfirst($appt->status) ?></span></td>
+                                <td>
+                                    <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn" style="white-space: nowrap;">View Details</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

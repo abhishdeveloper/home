@@ -10,15 +10,23 @@
         .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 20px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
-        .nav a { margin-left: 10px; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px; display: inline-block; }
+        .nav a { margin-left: 10px; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
         .card-row { display: flex; gap: 20px; margin-bottom: 20px; }
         .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
         .metric-card h3 { margin: 0; font-size: 2em; color: #007bff; }
         .metric-card p { margin: 5px 0 0 0; color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
         .card { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-        .appt-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; align-items: center;}
+        .appt-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; align-items: center; flex-wrap: wrap; gap: 10px;}
         .appt-item:last-child { border-bottom: none; }
-        .btn-sm { padding: 5px 10px; background: #28a745; color: #fff; text-decoration: none; border-radius: 3px; font-size: 0.9em; }
+        .btn-sm { padding: 5px 10px; background: #28a745; color: #fff; text-decoration: none; border-radius: 3px; font-size: 0.9em; white-space: nowrap;}
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; gap: 15px; }
+            .user-info { flex-direction: column; }
+            .nav { display: flex; flex-direction: column; width: 100%; }
+            .nav a { margin-left: 0; text-align: center; }
+            .card-row { flex-direction: column; }
+        }
     </style>
 </head>
 <body>

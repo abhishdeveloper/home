@@ -10,7 +10,7 @@
         .header { display: flex; justify-content: space-between; border-bottom: 2px solid #007bff; padding-bottom: 20px; margin-bottom: 20px; }
         .clinic-info h1 { margin: 0; color: #007bff; }
         .clinic-info p { margin: 5px 0; font-size: 0.9em; color: #666; }
-        .patient-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between;}
+        .patient-info { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;}
         .rx-symbol { font-size: 2em; font-weight: bold; margin-bottom: 15px; font-style: italic; }
         .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .table th, .table td { padding: 10px; border-bottom: 1px dotted #ccc; text-align: left; }
@@ -18,8 +18,15 @@
         .notes-section { margin-top: 30px; }
         .footer { margin-top: 50px; text-align: right; border-top: 1px solid #ddd; padding-top: 20px; }
 
-        .no-print { text-align: center; margin-bottom: 20px; }
+        .no-print { text-align: center; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;}
         .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: #fff; text-decoration: none; border-radius: 3px; cursor: pointer; border: none; font-size: 16px; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; gap: 20px; }
+            .header > div { text-align: center !important; }
+            .table th, .table td { padding: 5px; font-size: 0.9em;}
+            .table-container { overflow-x: auto; width: 100%; }
+        }
 
         @media print {
             body { background: #fff; padding: 0; }
@@ -66,30 +73,32 @@
 
         <div class="rx-symbol">Rx</div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">#</th>
-                    <th style="width: 35%;">Medicine Name</th>
-                    <th style="width: 20%;">Dosage</th>
-                    <th style="width: 40%;">Instructions / Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($data['medicines'])): ?>
-                    <tr><td colspan="4">No medicines prescribed.</td></tr>
-                <?php else: ?>
-                    <?php $count = 1; foreach ($data['medicines'] as $med): ?>
-                        <tr>
-                            <td><?= $count++ ?></td>
-                            <td><strong><?= Security::escape($med['name']) ?></strong></td>
-                            <td><?= Security::escape($med['dosage']) ?></td>
-                            <td><?= Security::escape($med['notes']) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table" style="min-width: 500px;">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">Medicine Name</th>
+                        <th style="width: 20%;">Dosage</th>
+                        <th style="width: 40%;">Instructions / Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($data['medicines'])): ?>
+                        <tr><td colspan="4">No medicines prescribed.</td></tr>
+                    <?php else: ?>
+                        <?php $count = 1; foreach ($data['medicines'] as $med): ?>
+                            <tr>
+                                <td><?= $count++ ?></td>
+                                <td><strong><?= Security::escape($med['name']) ?></strong></td>
+                                <td><?= Security::escape($med['dosage']) ?></td>
+                                <td><?= Security::escape($med['notes']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
         <?php if (!empty($data['prescription']->general_notes)): ?>
             <div class="notes-section">

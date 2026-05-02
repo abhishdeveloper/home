@@ -11,6 +11,12 @@
     .footer-col a { color: #bdc3c7; text-decoration: none; transition: color 0.3s; }
     .footer-col a:hover { color: #fff; }
     .footer-bottom { text-align: center; padding-top: 20px; color: #7f8c8d; }
+
+    @media (max-width: 768px) {
+        .footer-grid { flex-direction: column; text-align: center; }
+        .footer-col { min-width: 100%; }
+        .footer { padding: 40px 20px 20px 20px; }
+    }
 </style>
 
 <footer class="footer">

@@ -12,9 +12,13 @@
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
         .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; }
 
-        .medicine-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .medicine-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 3px; }
-        .medicine-row .med-notes { flex: 2; }
+        .medicine-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;}
+        .medicine-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 3px; min-width: 150px;}
+        .medicine-row .med-notes { flex: 2; min-width: 250px;}
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; gap: 15px; }
+        }
         .btn { display: inline-block; padding: 10px 15px; background: #007bff; color: #fff; border: none; cursor: pointer; border-radius: 3px; text-decoration: none; }
         .btn-danger { background: #dc3545; }
         .btn-success { background: #28a745; }

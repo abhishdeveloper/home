@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($data['title']) ? Security::escape($data['title']) . ' - ' . SITE_NAME : SITE_NAME ?></title>
     <style>
+        * { box-sizing: border-box; }
+        img { max-width: 100%; height: auto; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f4f7f6; color: #333; line-height: 1.6; }
 
         /* Navbar */
@@ -23,6 +25,13 @@
 
         /* Cards */
         .card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;}
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; text-align: center; }
+            .navbar .nav-links { justify-content: center; gap: 10px; }
+            .main-container { margin: 20px auto; padding: 0 15px; }
+        }
     </style>
 </head>
 <body>

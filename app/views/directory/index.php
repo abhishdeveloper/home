@@ -15,6 +15,12 @@
     .search-filter input { flex: 2; }
     .search-filter select { flex: 1; }
     .search-filter button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+
+    @media (max-width: 768px) {
+        .search-filter { flex-direction: column; }
+        .clinic-card { flex-direction: column; text-align: center; }
+        .clinic-actions { text-align: center; }
+    }
 </style>
 
 <h2>Doctor Directory</h2>

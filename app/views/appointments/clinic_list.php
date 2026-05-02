@@ -26,61 +26,63 @@
             <a href="<?= URL_ROOT ?>/clinicDashboard" class="btn" style="background:#6c757d;">Back to Dashboard</a>
         </div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date & Time</th>
-                    <th>Patient Name</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($data['appointments'])): ?>
-                    <tr><td colspan="4">No appointments found.</td></tr>
-                <?php else: ?>
-                    <?php foreach ($data['appointments'] as $appt): ?>
-                        <tr>
-                            <td><?= date('M d, Y', strtotime($appt->appointment_date)) ?> at <?= date('h:i A', strtotime($appt->appointment_time)) ?></td>
-                            <td>
-                                <?= Security::escape($appt->patient_name) ?>
-                                <?php if ($appt->patient_review_count > 0): ?>
-                                    <br><small style="color: #f39c12;">⭐ <?= number_format($appt->patient_rating, 1) ?> (<?= $appt->patient_review_count ?>)</small>
-                                <?php else: ?>
-                                    <br><small style="color: #999;">No ratings</small>
-                                <?php endif; ?>
-                            </td>
-                            <td><span class="status <?= $appt->status ?>"><?= ucfirst($appt->status) ?></span></td>
-                            <td>
-                                <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn">View & Chat</a>
+        <div style="overflow-x: auto; width: 100%;">
+            <table class="table" style="min-width: 600px;">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Patient Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($data['appointments'])): ?>
+                        <tr><td colspan="4">No appointments found.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($data['appointments'] as $appt): ?>
+                            <tr>
+                                <td><?= date('M d, Y', strtotime($appt->appointment_date)) ?><br><span style="color:#666; font-size:0.9em;"><?= date('h:i A', strtotime($appt->appointment_time)) ?></span></td>
+                                <td>
+                                    <?= Security::escape($appt->patient_name) ?>
+                                    <?php if ($appt->patient_review_count > 0): ?>
+                                        <br><small style="color: #f39c12;">⭐ <?= number_format($appt->patient_rating, 1) ?> (<?= $appt->patient_review_count ?>)</small>
+                                    <?php else: ?>
+                                        <br><small style="color: #999;">No ratings</small>
+                                    <?php endif; ?>
+                                </td>
+                                <td><span class="status <?= $appt->status ?>"><?= ucfirst($appt->status) ?></span></td>
+                                <td style="white-space: nowrap;">
+                                    <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn">View & Chat</a>
 
-                                <?php if ($appt->status == 'pending'): ?>
-                                    <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
-                                        <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
-                                        <input type="hidden" name="status" value="approved">
-                                        <button type="submit" class="btn btn-success">Approve</button>
-                                    </form>
-                                    <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
-                                        <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
-                                        <input type="hidden" name="status" value="rejected">
-                                        <button type="submit" class="btn btn-danger">Reject</button>
-                                    </form>
-                                <?php elseif ($appt->status == 'approved'): ?>
-                                    <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
-                                        <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
-                                        <input type="hidden" name="status" value="completed">
-                                        <button type="submit" class="btn" style="background:#17a2b8;">Mark Completed</button>
-                                    </form>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                                    <?php if ($appt->status == 'pending'): ?>
+                                        <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                                            <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
+                                            <input type="hidden" name="status" value="approved">
+                                            <button type="submit" class="btn btn-success" style="margin-top:5px;">Approve</button>
+                                        </form>
+                                        <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                                            <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
+                                            <input type="hidden" name="status" value="rejected">
+                                            <button type="submit" class="btn btn-danger" style="margin-top:5px;">Reject</button>
+                                        </form>
+                                    <?php elseif ($appt->status == 'approved'): ?>
+                                        <form action="<?= URL_ROOT ?>/appointment/updateStatus" method="POST" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                                            <input type="hidden" name="appointment_id" value="<?= $appt->id ?>">
+                                            <input type="hidden" name="status" value="completed">
+                                            <button type="submit" class="btn" style="background:#17a2b8; margin-top:5px;">Mark Completed</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
