@@ -56,6 +56,18 @@
                 </select>
             </div>
 
+            <div class="form-group" style="background: #e9ecef; padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 15px;">
+                <label style="margin:0;">Load Template:</label>
+                <select id="templateSelector" style="width: auto; flex: 1;">
+                    <option value="">-- Blank Page --</option>
+                    <option value="home">Modern Home Page</option>
+                    <option value="services">Services List</option>
+                    <option value="team">Our Team / Doctors</option>
+                    <option value="contact">Contact & Location</option>
+                </select>
+                <button type="button" id="loadTemplateBtn" class="btn" style="background: #17a2b8; padding: 6px 12px;">Insert Template</button>
+            </div>
+
             <div class="form-group">
                 <label>Page Content</label>
                 <div id="editor"><?= $data['content'] // Intentionally NOT escaped so we can re-render HTML if form fails validation ?></div>
@@ -72,14 +84,41 @@
             theme: 'snow',
             modules: {
                 toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
+                    [{ 'font': [] }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
                     ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                     [{ 'color': [] }, { 'background': [] }],
-                    ['link', 'image'],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'header': 1 }, { 'header': 2 }, 'blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'align': [] }],
+                    ['link', 'image', 'video'],
                     ['clean']
                 ]
+            }
+        });
+
+        // Template System
+        const templates = {
+            'home': `<h1 class="ql-align-center">Welcome to Our Clinic</h1><p class="ql-align-center"><br></p><p class="ql-align-center">We provide world-class healthcare tailored to your needs.</p><p class="ql-align-center"><br></p><hr><h2 class="ql-align-center">Why Choose Us?</h2><p><br></p><ul><li><strong>Expert Care:</strong> Highly qualified specialists.</li><li><strong>Modern Facilities:</strong> State-of-the-art technology.</li><li><strong>Patient First:</strong> We care about your comfort.</li></ul><p><br></p>`,
+            'services': `<h2>Our Medical Services</h2><p><br></p><h3>1. General Consultation</h3><p>Comprehensive health checkups and personalized medical advice.</p><p><br></p><h3>2. Diagnostic Services</h3><p>Accurate and fast diagnostic testing.</p><p><br></p><h3>3. Specialized Care</h3><p>Treatment plans designed by experts for specific conditions.</p>`,
+            'team': `<h2 class="ql-align-center">Meet Our Specialists</h2><p class="ql-align-center"><br></p><h3>Dr. John Doe</h3><p><em>Chief Medical Officer</em></p><p>Dr. Doe has over 15 years of experience in general medicine and specializes in preventive care.</p><p><br></p><hr><p><br></p><h3>Dr. Jane Smith</h3><p><em>Lead Surgeon</em></p><p>Dr. Smith is a board-certified surgeon with a passion for minimally invasive techniques.</p>`,
+            'contact': `<h2>Contact Us</h2><p>If you have any questions or need to schedule an appointment, please reach out to us!</p><p><br></p><h3>Opening Hours:</h3><p>Monday - Friday: 9:00 AM - 5:00 PM</p><p>Saturday: 10:00 AM - 2:00 PM</p><p>Sunday: Closed</p><p><br></p><h3>Location:</h3><p>123 Health Avenue, Medical District.</p><p><strong>Phone: </strong>+1 234 567 890</p><p><strong>Email: </strong>contact@ourclinic.com</p>`
+        };
+
+        document.getElementById('loadTemplateBtn').addEventListener('click', function() {
+            const selected = document.getElementById('templateSelector').value;
+            if (selected && templates[selected]) {
+                if (quill.getLength() > 1) { // If editor is not empty
+                    if (!confirm('Loading this template will overwrite your current content. Proceed?')) {
+                        return;
+                    }
+                }
+                const html = templates[selected];
+                quill.clipboard.dangerouslyPasteHTML(html);
             }
         });
 

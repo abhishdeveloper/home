@@ -113,8 +113,13 @@ class ClinicDashboardController extends Controller {
             // Sanitize WYSIWYG HTML Content using HTMLPurifier to prevent Stored XSS
             require_once APP_ROOT . '/app/helpers/HTMLPurifier.standalone.php';
             $config = HTMLPurifier_Config::createDefault();
-            // Optional: configure to allow specific tags or attributes if needed
-            // $config->set('HTML.Allowed', 'p,b,a[href],i,ul,li,h1,h2,h3,h4,strong,em,u,s,blockquote,br,img[src|alt|width|height]');
+
+            // Allow Quill's inline styles and classes
+            $config->set('CSS.AllowTricky', true);
+            $config->set('Attr.AllowedClasses', 'ql-align-center,ql-align-right,ql-align-justify,ql-font-serif,ql-font-monospace,ql-size-small,ql-size-large,ql-size-huge,ql-indent-1,ql-indent-2,ql-indent-3,ql-indent-4,ql-indent-5,ql-indent-6,ql-indent-7,ql-indent-8,ql-video');
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%'); // Allow safe video embeds if used
+
             $purifier = new HTMLPurifier($config);
             $data['content'] = $purifier->purify($_POST['content'] ?? '');
 
@@ -181,6 +186,10 @@ class ClinicDashboardController extends Controller {
 
             require_once APP_ROOT . '/app/helpers/HTMLPurifier.standalone.php';
             $config = HTMLPurifier_Config::createDefault();
+            $config->set('CSS.AllowTricky', true);
+            $config->set('Attr.AllowedClasses', 'ql-align-center,ql-align-right,ql-align-justify,ql-font-serif,ql-font-monospace,ql-size-small,ql-size-large,ql-size-huge,ql-indent-1,ql-indent-2,ql-indent-3,ql-indent-4,ql-indent-5,ql-indent-6,ql-indent-7,ql-indent-8,ql-video');
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%');
             $purifier = new HTMLPurifier($config);
             $data['content'] = $purifier->purify($_POST['content'] ?? '');
 
