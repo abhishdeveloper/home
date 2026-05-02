@@ -56,6 +56,7 @@ class OnboardingController extends Controller {
         $existingProfile = $patientModel->getProfileByUserId(Session::get('user_id'));
 
         $data = [
+            'phone' => $existingProfile ? $existingProfile->phone : '',
             'age' => $existingProfile ? $existingProfile->age : '',
             'address' => $existingProfile ? $existingProfile->address : '',
             'preferred_specialty_id' => $existingProfile ? $existingProfile->preferred_specialty_id : '',
@@ -70,10 +71,17 @@ class OnboardingController extends Controller {
 
             $profileData = [
                 'user_id' => Session::get('user_id'),
+                'phone' => trim(htmlspecialchars($_POST['phone'] ?? '')),
                 'age' => !empty($_POST['age']) ? (int)$_POST['age'] : null,
                 'address' => trim(htmlspecialchars($_POST['address'] ?? '')),
                 'preferred_specialty_id' => !empty($_POST['preferred_specialty_id']) ? (int)$_POST['preferred_specialty_id'] : null
             ];
+
+            if (empty($profileData['phone'])) {
+                $data['error'] = 'Phone number is mandatory for telemedicine appointments.';
+                $this->view('onboarding/patient', $data);
+                return;
+            }
 
             if ($existingProfile) {
                 if ($patientModel->updateProfile($profileData)) {
@@ -164,6 +172,10 @@ class OnboardingController extends Controller {
             }
 
             // Validate
+            if (empty($data['phone'])) {
+                $data['error'] = 'Phone number is mandatory for clinics.';
+            }
+
             if (empty($data['slug'])) {
                 $data['slug_err'] = 'Please enter a unique URL slug.';
             } else {
@@ -176,7 +188,7 @@ class OnboardingController extends Controller {
                 $data['clinic_name_err'] = 'Please enter clinic/doctor name.';
             }
 
-            if (empty($data['slug_err']) && empty($data['clinic_name_err'])) {
+            if (empty($data['slug_err']) && empty($data['clinic_name_err']) && empty($data['error'])) {
                 $profileData = [
                     'user_id' => Session::get('user_id'),
                     'slug' => $data['slug'],

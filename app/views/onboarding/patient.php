@@ -25,6 +25,11 @@
             <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
 
             <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" name="phone" id="phone" value="<?= Security::escape($data['phone'] ?? '') ?>" required>
+            </div>
+
+            <div class="form-group">
                 <label for="age">Age</label>
                 <input type="number" name="age" id="age" value="<?= Security::escape($data['age'] ?? '') ?>">
             </div>

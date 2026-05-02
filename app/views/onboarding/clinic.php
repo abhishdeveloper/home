@@ -77,8 +77,8 @@
 
             <div class="row">
                 <div class="col form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="text" name="phone" id="phone" value="<?= Security::escape($data['phone'] ?? '') ?>">
+                    <label for="phone">Phone Number *</label>
+                    <input type="text" name="phone" id="phone" value="<?= Security::escape($data['phone'] ?? '') ?>" required>
                 </div>
                 <div class="col form-group">
                     <label for="whatsapp">WhatsApp Number</label>

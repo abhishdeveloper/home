@@ -61,6 +61,7 @@ INSERT INTO specialties (name) VALUES
 CREATE TABLE IF NOT EXISTS patient_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
+    phone VARCHAR(50) NOT NULL,
     age INT NULL,
     address TEXT NULL,
     preferred_specialty_id INT NULL,
@@ -146,6 +147,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     appointment_date DATE NOT NULL,
     appointment_time TIME NOT NULL,
     status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
+    private_notes TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (patient_id) REFERENCES patient_profiles(user_id) ON DELETE CASCADE,
@@ -161,6 +163,18 @@ CREATE TABLE IF NOT EXISTS appointment_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Appointment Medical Attachments (Lab reports, past prescriptions, etc.)
+CREATE TABLE IF NOT EXISTS appointment_attachments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT NOT NULL,
+    uploader_id INT NOT NULL, -- usually patient
+    file_name VARCHAR(255) NOT NULL,
+    file_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Saved Medicines for Clinic

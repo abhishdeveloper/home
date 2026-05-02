@@ -91,11 +91,52 @@ class AppointmentController extends Controller {
         $patientReview = $reviewModel->getPatientReviewByAppointment($id);
         $clinicReview = $reviewModel->getClinicReviewByAppointment($id);
 
+        $attachments = $appointmentModel->getAttachments($id);
+
         $data = [
             'appointment' => $appt,
             'patientReview' => $patientReview,
-            'clinicReview' => $clinicReview
+            'clinicReview' => $clinicReview,
+            'attachments' => $attachments,
+            'attachment_error' => ''
         ];
+
+        // Handle attachment upload
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['attachment'])) {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            // Only allow uploads if appointment is approved or pending
+            if ($appt->status == 'completed' || $appt->status == 'rejected') {
+                $data['attachment_error'] = 'Cannot upload files to completed or rejected appointments.';
+            } else {
+                if ($_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = APP_ROOT . '/public/attachments/';
+                    $fileTmp = $_FILES['attachment']['tmp_name'];
+                    $originalName = basename($_FILES['attachment']['name']);
+                    $fileExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                    $allowedExts = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+
+                    if (in_array($fileExt, $allowedExts)) {
+                        $newFileName = md5(time() . $originalName . Session::get('user_id')) . '.' . $fileExt;
+                        $destPath = $uploadDir . $newFileName;
+                        if (move_uploaded_file($fileTmp, $destPath)) {
+                            $file_url = '/attachments/' . $newFileName;
+                            $appointmentModel->addAttachment($id, Session::get('user_id'), Security::escape($originalName), $file_url);
+                            header('Location: ' . URL_ROOT . '/appointment/view/' . $id);
+                            exit;
+                        } else {
+                            $data['attachment_error'] = 'Failed to move uploaded file.';
+                        }
+                    } else {
+                        $data['attachment_error'] = 'Invalid file type. Allowed: JPG, PNG, PDF, DOC, DOCX.';
+                    }
+                } else {
+                    $data['attachment_error'] = 'File upload error.';
+                }
+            }
+        }
 
         $this->view('appointments/view', $data);
     }
@@ -112,6 +153,30 @@ class AppointmentController extends Controller {
             echo json_encode(['error' => 'Unauthorized']);
         }
         exit;
+    }
+
+    public function saveNotes() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && Session::get('user_role_id') == 2) {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                echo json_encode(['success' => false, 'error' => 'CSRF Failed']);
+                exit;
+            }
+
+            $appointment_id = (int)$_POST['appointment_id'];
+            $notes = $_POST['notes']; // Raw text, we will escape on output
+
+            $appointmentModel = $this->model('AppointmentModel');
+            $appt = $appointmentModel->getById($appointment_id);
+
+            if ($appt && $appt->doctor_user_id == Session::get('user_id')) {
+                if ($appointmentModel->updatePrivateNotes($appointment_id, $notes)) {
+                    echo json_encode(['success' => true]);
+                    exit;
+                }
+            }
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            exit;
+        }
     }
 
     public function sendMessage() {

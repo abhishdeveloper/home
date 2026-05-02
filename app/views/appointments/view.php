@@ -37,14 +37,25 @@
                     <strong>Patient:</strong> <?= Security::escape($data['appointment']->patient_name) ?> |
                     <strong>Clinic:</strong> <?= Security::escape($data['appointment']->clinic_name) ?>
                 </p>
+                <div style="margin-top: 10px;">
+                    <?php if (Session::get('user_role_id') == 2): // Doctor viewing ?>
+                        <a href="tel:<?= Security::escape($data['appointment']->patient_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em;">📞 Call Patient (<?= Security::escape($data['appointment']->patient_phone) ?>)</a>
+                    <?php elseif (Session::get('user_role_id') == 3): // Patient viewing ?>
+                        <a href="tel:<?= Security::escape($data['appointment']->clinic_phone) ?>" class="btn" style="background:#17a2b8; padding: 5px 10px; border-radius:20px; font-size: 0.85em;">📞 Call Clinic (<?= Security::escape($data['appointment']->clinic_phone) ?>)</a>
+                    <?php endif; ?>
+                </div>
             </div>
-            <div>
+            <div style="text-align: right;">
                 <span class="status <?= $data['appointment']->status ?>"><?= ucfirst($data['appointment']->status) ?></span>
                 <br><br>
                 <a href="<?= URL_ROOT ?>/appointment" class="btn" style="background:#6c757d;">Back to List</a>
             </div>
         </div>
 
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+
+        <!-- Left Column: Chat & Video -->
+        <div style="flex: 2; min-width: 400px;">
         <?php if ($data['appointment']->status == 'approved'): ?>
             <div style="background: #e2e3e5; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;" id="video_section">
                 <h3>Video Consultation</h3>
@@ -204,6 +215,80 @@
         <?php else: ?>
             <p>Chat and Video capabilities will be available once the appointment is approved by the clinic.</p>
         <?php endif; ?>
+        </div> <!-- End Left Column -->
+
+        <!-- Right Column: Medical Attachments & Notes -->
+        <div style="flex: 1; min-width: 300px; background: #fff; border: 1px solid #ddd; border-radius: 5px; padding: 15px;">
+            <h3 style="margin-top: 0; border-bottom: 2px solid #17a2b8; padding-bottom: 5px;">Medical Records & Attachments</h3>
+            <p style="font-size: 0.9em; color: #666;">Upload past prescriptions, lab reports, or images relevant to this consultation.</p>
+
+            <?php if (!empty($data['attachment_error'])): ?>
+                <div style="color: red; font-size: 0.9em; margin-bottom: 10px;"><?= Security::escape($data['attachment_error']) ?></div>
+            <?php endif; ?>
+
+            <?php if (in_array($data['appointment']->status, ['pending', 'approved'])): ?>
+                <form action="<?= URL_ROOT ?>/appointment/view/<?= $data['appointment']->id ?>" method="POST" enctype="multipart/form-data" style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px;">
+                    <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                    <input type="file" name="attachment" style="margin-bottom: 10px; width: 100%;" required>
+                    <button type="submit" class="btn" style="padding: 5px 10px; font-size: 0.85em; background: #28a745;">Upload File</button>
+                </form>
+            <?php endif; ?>
+
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <?php if (empty($data['attachments'])): ?>
+                    <li style="font-size: 0.9em; color: #999;">No attachments uploaded yet.</li>
+                <?php else: ?>
+                    <?php foreach ($data['attachments'] as $att): ?>
+                        <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                            <a href="<?= URL_ROOT . Security::escape($att->file_url) ?>" target="_blank" style="text-decoration: none; color: #007bff; font-weight: bold;">
+                                📄 <?= Security::escape($att->file_name) ?>
+                            </a>
+                            <div style="font-size: 0.8em; color: #666;">Uploaded by <?= Security::escape($att->uploader_name) ?> on <?= date('M d', strtotime($att->created_at)) ?></div>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+
+            <?php if (Session::get('user_role_id') == 2): // Doctor Private Notes ?>
+                <div style="margin-top: 40px; background: #fff8e1; border: 1px solid #ffeeba; border-radius: 5px; padding: 15px;">
+                    <h3 style="margin-top: 0; color: #856404; font-size: 1.1em;">Private Medical Notes</h3>
+                    <p style="font-size: 0.85em; color: #666;">These notes are only visible to you.</p>
+                    <form id="notesForm">
+                        <textarea id="private_notes" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace; resize: vertical;"><?= Security::escape($data['appointment']->private_notes ?? '') ?></textarea>
+                        <button type="button" id="saveNotesBtn" class="btn" style="background: #28a745; margin-top: 10px; padding: 5px 10px; font-size: 0.85em;">Save Notes</button>
+                        <span id="notesStatus" style="font-size: 0.8em; color: green; margin-left: 10px; display: none;">Saved!</span>
+                    </form>
+                </div>
+                <script>
+                    document.getElementById('saveNotesBtn').addEventListener('click', function() {
+                        let text = document.getElementById('private_notes').value;
+                        let csrf = document.getElementById('chat_csrf') ? document.getElementById('chat_csrf').value : '<?= Security::generateCSRFToken() ?>'; // fallback if chat is hidden
+                        let statusSpan = document.getElementById('notesStatus');
+
+                        let formData = new FormData();
+                        formData.append('appointment_id', <?= $data['appointment']->id ?>);
+                        formData.append('notes', text);
+                        formData.append('csrf_token', csrf);
+
+                        fetch('<?= URL_ROOT ?>/appointment/saveNotes', {
+                            method: 'POST',
+                            body: formData
+                        }).then(res => res.json())
+                          .then(data => {
+                            if(data.success) {
+                                statusSpan.style.display = 'inline';
+                                setTimeout(() => { statusSpan.style.display = 'none'; }, 2000);
+                            } else {
+                                alert(data.error || 'Failed to save notes.');
+                            }
+                        });
+                    });
+                </script>
+            <?php endif; ?>
+
+        </div> <!-- End Right Column -->
+
+        </div> <!-- End Flex Container -->
     </div>
 </body>
 </html>

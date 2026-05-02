@@ -55,7 +55,7 @@ class AppointmentModel {
     }
 
     public function getById($id) {
-        $this->db->query('SELECT a.*, u.name as patient_name, cp.clinic_name, cp.user_id as doctor_user_id FROM appointments a JOIN patient_profiles pp ON a.patient_id = pp.user_id JOIN users u ON pp.user_id = u.id JOIN clinic_profiles cp ON a.clinic_id = cp.id WHERE a.id = :id');
+        $this->db->query('SELECT a.*, u.name as patient_name, pp.phone as patient_phone, cp.clinic_name, cp.phone as clinic_phone, cp.user_id as doctor_user_id FROM appointments a JOIN patient_profiles pp ON a.patient_id = pp.user_id JOIN users u ON pp.user_id = u.id JOIN clinic_profiles cp ON a.clinic_id = cp.id WHERE a.id = :id');
         $this->db->bind(':id', $id);
         return $this->db->single();
     }
@@ -63,6 +63,13 @@ class AppointmentModel {
     public function updateStatus($id, $status) {
         $this->db->query('UPDATE appointments SET status = :status WHERE id = :id');
         $this->db->bind(':status', $status);
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+
+    public function updatePrivateNotes($id, $notes) {
+        $this->db->query('UPDATE appointments SET private_notes = :notes WHERE id = :id');
+        $this->db->bind(':notes', $notes);
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
@@ -105,6 +112,22 @@ class AppointmentModel {
         $this->db->bind(':patient_id', $patient_user_id);
         $this->db->bind(':limit', $limit);
         return $this->db->resultSet();
+    }
+
+    // Medical Attachments
+    public function getAttachments($appointment_id) {
+        $this->db->query('SELECT aa.*, u.name as uploader_name FROM appointment_attachments aa JOIN users u ON aa.uploader_id = u.id WHERE aa.appointment_id = :appointment_id ORDER BY aa.created_at ASC');
+        $this->db->bind(':appointment_id', $appointment_id);
+        return $this->db->resultSet();
+    }
+
+    public function addAttachment($appointment_id, $uploader_id, $file_name, $file_url) {
+        $this->db->query('INSERT INTO appointment_attachments (appointment_id, uploader_id, file_name, file_url) VALUES (:appointment_id, :uploader_id, :file_name, :file_url)');
+        $this->db->bind(':appointment_id', $appointment_id);
+        $this->db->bind(':uploader_id', $uploader_id);
+        $this->db->bind(':file_name', $file_name);
+        $this->db->bind(':file_url', $file_url);
+        return $this->db->execute();
     }
 
     // Chat Messages
