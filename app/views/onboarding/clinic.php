@@ -24,7 +24,7 @@
             <span class="error"><?= Security::escape($data['error']) ?></span>
         <?php endif; ?>
 
-        <form action="<?= URL_ROOT ?>/onboarding/clinic" method="POST">
+        <form action="<?= URL_ROOT ?>/onboarding/clinic" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
 
             <div class="form-group">
@@ -59,9 +59,15 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="primary_color">Primary Theme Color</label>
-                <input type="color" name="primary_color" id="primary_color" value="<?= Security::escape($data['primary_color'] ?? '#007bff') ?>">
+            <div class="row">
+                <div class="col form-group">
+                    <label for="primary_color">Primary Theme Color</label>
+                    <input type="color" name="primary_color" id="primary_color" value="<?= Security::escape($data['primary_color'] ?? '#007bff') ?>">
+                </div>
+                <div class="col form-group">
+                    <label for="logo">Clinic Logo (Optional)</label>
+                    <input type="file" name="logo" id="logo" accept="image/*">
+                </div>
             </div>
 
             <div class="form-group">

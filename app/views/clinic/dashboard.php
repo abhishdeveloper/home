@@ -26,6 +26,7 @@
             <nav>
                 <a href="<?= URL_ROOT ?>/appointment" class="btn" style="background:#17a2b8;">Appointments</a>
                 <a href="<?= URL_ROOT ?>/clinicDashboard/schedule" class="btn btn-success">Manage Schedule</a>
+                <a href="<?= URL_ROOT ?>/billing" class="btn" style="background:#6f42c1;">Billing & Upgrade</a>
                 <a href="<?= URL_ROOT ?>/onboarding/clinic" class="btn btn-warning">Edit Profile Settings</a>
                 <a href="<?= URL_ROOT ?>/auth/logout" class="btn">Logout</a>
             </nav>
@@ -77,8 +78,11 @@
                                 <td><?= ucfirst(Security::escape($page->status)) ?></td>
                                 <td><?= $page->is_home ? 'Homepage' : 'Inner Page' ?></td>
                                 <td>
-                                    <!-- Edit function would go here -->
-                                    <a href="#">Edit</a>
+                                    <a href="<?= URL_ROOT ?>/clinicDashboard/editPage/<?= $page->id ?>" class="btn btn-warning" style="padding: 5px 10px;">Edit</a>
+                                    <form action="<?= URL_ROOT ?>/clinicDashboard/deletePage/<?= $page->id ?>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this page?');">
+                                        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                                        <button type="submit" class="btn btn-danger" style="padding: 5px 10px; background: #dc3545;">Delete</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

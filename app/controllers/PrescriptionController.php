@@ -124,10 +124,14 @@ class PrescriptionController extends Controller {
 
         $medicines = json_decode($prescription->medicines_json, true);
 
+        $clinicModel = $this->model('ClinicModel');
+        $clinicProfile = $clinicModel->getProfileByUserId($appt->doctor_user_id);
+
         $data = [
             'appointment' => $appt,
             'prescription' => $prescription,
-            'medicines' => $medicines
+            'medicines' => $medicines,
+            'clinic_profile' => $clinicProfile
         ];
 
         // This view will be print-friendly

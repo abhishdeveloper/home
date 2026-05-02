@@ -39,13 +39,14 @@ class ClinicModel {
     }
 
     public function createProfile($data) {
-        $this->db->query('INSERT INTO clinic_profiles (user_id, slug, clinic_name, specialty_id, theme_id, primary_color, address, phone, whatsapp, facebook, instagram) VALUES (:user_id, :slug, :clinic_name, :specialty_id, :theme_id, :primary_color, :address, :phone, :whatsapp, :facebook, :instagram)');
+        $this->db->query('INSERT INTO clinic_profiles (user_id, slug, clinic_name, specialty_id, theme_id, primary_color, logo_url, address, phone, whatsapp, facebook, instagram) VALUES (:user_id, :slug, :clinic_name, :specialty_id, :theme_id, :primary_color, :logo_url, :address, :phone, :whatsapp, :facebook, :instagram)');
         $this->db->bind(':user_id', $data['user_id']);
         $this->db->bind(':slug', $data['slug']);
         $this->db->bind(':clinic_name', $data['clinic_name']);
         $this->db->bind(':specialty_id', $data['specialty_id']);
         $this->db->bind(':theme_id', $data['theme_id']);
         $this->db->bind(':primary_color', $data['primary_color']);
+        $this->db->bind(':logo_url', $data['logo_url'] ?? null);
         $this->db->bind(':address', $data['address']);
         $this->db->bind(':phone', $data['phone']);
         $this->db->bind(':whatsapp', $data['whatsapp']);
@@ -56,12 +57,21 @@ class ClinicModel {
     }
 
     public function updateProfile($data) {
-        $this->db->query('UPDATE clinic_profiles SET slug = :slug, clinic_name = :clinic_name, specialty_id = :specialty_id, theme_id = :theme_id, primary_color = :primary_color, address = :address, phone = :phone, whatsapp = :whatsapp, facebook = :facebook, instagram = :instagram WHERE user_id = :user_id');
+        $query = 'UPDATE clinic_profiles SET slug = :slug, clinic_name = :clinic_name, specialty_id = :specialty_id, theme_id = :theme_id, primary_color = :primary_color, address = :address, phone = :phone, whatsapp = :whatsapp, facebook = :facebook, instagram = :instagram';
+        if (isset($data['logo_url'])) {
+            $query .= ', logo_url = :logo_url';
+        }
+        $query .= ' WHERE user_id = :user_id';
+
+        $this->db->query($query);
         $this->db->bind(':slug', $data['slug']);
         $this->db->bind(':clinic_name', $data['clinic_name']);
         $this->db->bind(':specialty_id', $data['specialty_id']);
         $this->db->bind(':theme_id', $data['theme_id']);
         $this->db->bind(':primary_color', $data['primary_color']);
+        if (isset($data['logo_url'])) {
+            $this->db->bind(':logo_url', $data['logo_url']);
+        }
         $this->db->bind(':address', $data['address']);
         $this->db->bind(':phone', $data['phone']);
         $this->db->bind(':whatsapp', $data['whatsapp']);
@@ -76,6 +86,19 @@ class ClinicModel {
         $this->db->query('UPDATE clinic_profiles SET is_published = :status WHERE user_id = :user_id');
         $this->db->bind(':status', $status);
         $this->db->bind(':user_id', $user_id);
+        return $this->db->execute();
+    }
+
+    public function upgradeBranding($clinic_id) {
+        $this->db->query('UPDATE clinic_profiles SET has_paid_branding = 1 WHERE id = :clinic_id');
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->execute();
+    }
+
+    public function recordTransaction($clinic_id, $amount) {
+        $this->db->query('INSERT INTO billing_transactions (clinic_id, amount, status) VALUES (:clinic_id, :amount, "completed")');
+        $this->db->bind(':clinic_id', $clinic_id);
+        $this->db->bind(':amount', $amount);
         return $this->db->execute();
     }
 
@@ -105,6 +128,30 @@ class ClinicModel {
         $this->db->bind(':content', $data['content']);
         $this->db->bind(':is_home', $data['is_home'] ?? 0);
         $this->db->bind(':status', $data['status'] ?? 'draft');
+        return $this->db->execute();
+    }
+
+    public function getPageById($page_id) {
+        $this->db->query('SELECT * FROM clinic_pages WHERE id = :id');
+        $this->db->bind(':id', $page_id);
+        return $this->db->single();
+    }
+
+    public function updatePage($data) {
+        $this->db->query('UPDATE clinic_pages SET title = :title, slug = :slug, content = :content, is_home = :is_home, status = :status WHERE id = :id');
+        $this->db->bind(':id', $data['id']);
+        $this->db->bind(':title', $data['title']);
+        $this->db->bind(':slug', $data['slug']);
+        $this->db->bind(':content', $data['content']);
+        $this->db->bind(':is_home', $data['is_home'] ?? 0);
+        $this->db->bind(':status', $data['status'] ?? 'draft');
+        return $this->db->execute();
+    }
+
+    public function deletePage($page_id, $clinic_id) {
+        $this->db->query('DELETE FROM clinic_pages WHERE id = :id AND clinic_id = :clinic_id');
+        $this->db->bind(':id', $page_id);
+        $this->db->bind(':clinic_id', $clinic_id);
         return $this->db->execute();
     }
 

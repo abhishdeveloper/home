@@ -69,6 +69,12 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
 </head>
 <body>
 
+    <?php if (!$profile->has_paid_branding): ?>
+        <div style="background: #333; color: #fff; text-align: center; padding: 10px; font-size: 14px;">
+            Create this type of site for yours with <a href="https://abhish.in" target="_blank" style="color: #ffc107; font-weight: bold;">abhish.in</a>
+        </div>
+    <?php endif; ?>
+
     <div class="directory-bar">
         Powered by <a href="<?= URL_ROOT ?>/directory"><?= SITE_NAME ?></a>
     </div>
@@ -121,6 +127,12 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
     </div>
 
     <?= $footerHtml ?>
+
+    <?php if (!$profile->has_paid_branding): ?>
+        <div style="background: #333; color: #fff; text-align: center; padding: 15px; font-size: 14px; margin-top: 0;">
+            Want a professional site like this? <a href="https://abhish.in" target="_blank" style="color: #ffc107; font-weight: bold;">Create yours with abhish.in</a>
+        </div>
+    <?php endif; ?>
 
     <?php if ($data['schedule'] && Session::get('user_id') && Session::get('user_role_id') == 3): ?>
     <script>

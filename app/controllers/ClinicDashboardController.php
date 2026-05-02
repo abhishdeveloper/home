@@ -109,8 +109,15 @@ class ClinicDashboardController extends Controller {
 
             $data['title'] = trim(htmlspecialchars($_POST['title'] ?? ''));
             $data['slug'] = trim(strtolower(preg_replace('/[^a-zA-Z0-9-]/', '-', $_POST['slug'] ?? '')));
-            // Content must remain raw HTML to support the WYSIWYG editor. It is escaped on display conditionally.
-            $data['content'] = $_POST['content'] ?? '';
+
+            // Sanitize WYSIWYG HTML Content using HTMLPurifier to prevent Stored XSS
+            require_once APP_ROOT . '/app/helpers/HTMLPurifier.standalone.php';
+            $config = HTMLPurifier_Config::createDefault();
+            // Optional: configure to allow specific tags or attributes if needed
+            // $config->set('HTML.Allowed', 'p,b,a[href],i,ul,li,h1,h2,h3,h4,strong,em,u,s,blockquote,br,img[src|alt|width|height]');
+            $purifier = new HTMLPurifier($config);
+            $data['content'] = $purifier->purify($_POST['content'] ?? '');
+
             $data['is_home'] = isset($_POST['is_home']) ? 1 : 0;
             $data['status'] = in_array($_POST['status'] ?? '', ['draft', 'published']) ? $_POST['status'] : 'draft';
 
@@ -143,5 +150,78 @@ class ClinicDashboardController extends Controller {
         }
 
         $this->view('clinic/createPage', $data);
+    }
+
+    public function editPage($id) {
+        $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+        $page = $this->clinicModel->getPageById($id);
+
+        if (!$page || $page->clinic_id != $profile->id) {
+            header('Location: ' . URL_ROOT . '/clinicDashboard');
+            exit;
+        }
+
+        $data = [
+            'id' => $page->id,
+            'title' => $page->title,
+            'slug' => $page->slug,
+            'content' => $page->content,
+            'is_home' => $page->is_home,
+            'status' => $page->status,
+            'error' => ''
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            $data['title'] = trim(htmlspecialchars($_POST['title'] ?? ''));
+            $data['slug'] = trim(strtolower(preg_replace('/[^a-zA-Z0-9-]/', '-', $_POST['slug'] ?? '')));
+
+            require_once APP_ROOT . '/app/helpers/HTMLPurifier.standalone.php';
+            $config = HTMLPurifier_Config::createDefault();
+            $purifier = new HTMLPurifier($config);
+            $data['content'] = $purifier->purify($_POST['content'] ?? '');
+
+            $data['is_home'] = isset($_POST['is_home']) ? 1 : 0;
+            $data['status'] = in_array($_POST['status'] ?? '', ['draft', 'published']) ? $_POST['status'] : 'draft';
+
+            if (empty($data['title']) || empty($data['slug'])) {
+                $data['error'] = 'Title and Slug are required.';
+            } else {
+                // Check if slug belongs to another page
+                $existingPage = $this->clinicModel->getPageBySlug($profile->id, $data['slug'], false);
+
+                if ($existingPage && $existingPage->id != $page->id) {
+                    $data['error'] = 'A page with this URL slug already exists. Please choose a different slug.';
+                } else {
+                    if ($this->clinicModel->updatePage($data)) {
+                        header('Location: ' . URL_ROOT . '/clinicDashboard');
+                        exit;
+                    } else {
+                        $data['error'] = 'Failed to update page. An unexpected error occurred.';
+                    }
+                }
+            }
+        }
+
+        // We can reuse the createPage view with a flag, or create an editPage view.
+        // For simplicity, we'll render an edit view.
+        $this->view('clinic/editPage', $data);
+    }
+
+    public function deletePage($id) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+            $this->clinicModel->deletePage($id, $profile->id);
+
+            header('Location: ' . URL_ROOT . '/clinicDashboard');
+            exit;
+        }
     }
 }

@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS clinic_profiles (
     facebook VARCHAR(255) NULL,
     instagram VARCHAR(255) NULL,
     is_published TINYINT(1) DEFAULT 0,
+    has_paid_branding TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -179,4 +180,14 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     general_notes TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Billing Transactions
+CREATE TABLE IF NOT EXISTS billing_transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    clinic_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'completed',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -141,6 +141,28 @@ class OnboardingController extends Controller {
             $data['facebook'] = trim(htmlspecialchars($_POST['facebook'] ?? ''));
             $data['instagram'] = trim(htmlspecialchars($_POST['instagram'] ?? ''));
 
+            // Handle Logo Upload
+            $logo_url = null;
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+                // APP_ROOT is the absolute path to the project root (e.g. /workspace/app)
+                // So the public dir is APP_ROOT . '/public/' or similar depending on exactly how it's defined.
+                // In config.php: define('APP_ROOT', dirname(dirname(__FILE__)));
+                // Which means APP_ROOT is /workspace (the repo root)
+                $uploadDir = APP_ROOT . '/public/images/logos/';
+                $fileTmp = $_FILES['logo']['tmp_name'];
+                $fileName = basename($_FILES['logo']['name']);
+                $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                if (in_array($fileExt, $allowedExts)) {
+                    $newFileName = md5(time() . $fileName) . '.' . $fileExt;
+                    $destPath = $uploadDir . $newFileName;
+                    if (move_uploaded_file($fileTmp, $destPath)) {
+                        $logo_url = '/images/logos/' . $newFileName;
+                    }
+                }
+            }
+
             // Validate
             if (empty($data['slug'])) {
                 $data['slug_err'] = 'Please enter a unique URL slug.';
@@ -169,6 +191,10 @@ class OnboardingController extends Controller {
                     'instagram' => $data['instagram']
                 ];
 
+                if ($logo_url) {
+                    $profileData['logo_url'] = $logo_url;
+                }
+
                 if ($existingProfile) {
                     if ($clinicModel->updateProfile($profileData)) {
                         header('Location: ' . URL_ROOT . '/clinicDashboard');
@@ -176,6 +202,26 @@ class OnboardingController extends Controller {
                     }
                 } else {
                     if ($clinicModel->createProfile($profileData)) {
+                        // Generate Sample Pages
+                        $clinicProfile = $clinicModel->getProfileByUserId(Session::get('user_id'));
+                        if ($clinicProfile) {
+                            $clinicModel->createPage([
+                                'clinic_id' => $clinicProfile->id,
+                                'title' => 'Home',
+                                'slug' => 'home',
+                                'content' => '<h1>Welcome to ' . $data['clinic_name'] . '</h1><p>We provide the best care.</p>',
+                                'is_home' => 1,
+                                'status' => 'published'
+                            ]);
+                            $clinicModel->createPage([
+                                'clinic_id' => $clinicProfile->id,
+                                'title' => 'Contact Us',
+                                'slug' => 'contact',
+                                'content' => '<h2>Contact Information</h2><p>Address: ' . $data['address'] . '</p><p>Phone: ' . $data['phone'] . '</p>',
+                                'is_home' => 0,
+                                'status' => 'published'
+                            ]);
+                        }
                         header('Location: ' . URL_ROOT . '/clinicDashboard');
                         exit;
                     }

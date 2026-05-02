@@ -41,8 +41,16 @@
     <div class="prescription-paper">
         <div class="header">
             <div class="clinic-info">
+                <?php if (!empty($data['clinic_profile']->logo_url)): ?>
+                    <img src="<?= URL_ROOT . Security::escape($data['clinic_profile']->logo_url) ?>" alt="Clinic Logo" style="max-height: 80px; margin-bottom: 10px;">
+                <?php endif; ?>
                 <h1><?= Security::escape($data['appointment']->clinic_name) ?></h1>
-                <!-- We could query clinic profile here for address/phone, but keeping it simple for now -->
+                <?php if (!empty($data['clinic_profile']->address)): ?>
+                    <p><?= Security::escape($data['clinic_profile']->address) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($data['clinic_profile']->phone)): ?>
+                    <p>Tel: <?= Security::escape($data['clinic_profile']->phone) ?></p>
+                <?php endif; ?>
             </div>
             <div style="text-align: right; color: #666; font-size: 0.9em;">
                 <p><strong>Date:</strong> <?= date('M d, Y') ?></p>
