@@ -300,18 +300,78 @@
                 </div>
 
                 <div style="margin-top: 20px; background: #fff8e1; border: 1px solid #ffeeba; border-radius: 5px; padding: 15px;">
-                    <h3 style="margin-top: 0; color: #856404; font-size: 1.1em;">Private Medical Notes</h3>
-                    <p style="font-size: 0.85em; color: #666;">These notes are only visible to you.</p>
+                    <h3 style="margin-top: 0; color: #856404; font-size: 1.1em;">Clinical Notes (SOAP)</h3>
+                    <p style="font-size: 0.85em; color: #666;">These notes are only visible to you for internal record keeping.</p>
+
+                    <?php
+                        $soap = ['subjective' => '', 'objective' => '', 'assessment' => '', 'plan' => ''];
+                        if (!empty($data['appointment']->soap_notes)) {
+                            $soap = json_decode($data['appointment']->soap_notes, true);
+                        }
+                    ?>
+
+                    <form id="soapForm">
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-weight: bold; font-size: 0.9em; display:block;">Subjective (Symptoms, History):</label>
+                            <textarea id="soap_s" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"><?= Security::escape($soap['subjective'] ?? '') ?></textarea>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-weight: bold; font-size: 0.9em; display:block;">Objective (Vitals, Exam Findings):</label>
+                            <textarea id="soap_o" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"><?= Security::escape($soap['objective'] ?? '') ?></textarea>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-weight: bold; font-size: 0.9em; display:block;">Assessment (Diagnosis):</label>
+                            <textarea id="soap_a" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"><?= Security::escape($soap['assessment'] ?? '') ?></textarea>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-weight: bold; font-size: 0.9em; display:block;">Plan (Treatment, Medications):</label>
+                            <textarea id="soap_p" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"><?= Security::escape($soap['plan'] ?? '') ?></textarea>
+                        </div>
+
+                        <button type="button" id="saveSoapBtn" class="btn" style="background: #28a745; margin-top: 10px; padding: 5px 10px; font-size: 0.85em;">Save SOAP Notes</button>
+                        <span id="soapStatus" style="font-size: 0.8em; color: green; margin-left: 10px; display: none;">Saved!</span>
+                    </form>
+                </div>
+
+                <div style="margin-top: 20px; background: #fff8e1; border: 1px solid #ffeeba; border-radius: 5px; padding: 15px;">
+                    <h3 style="margin-top: 0; color: #856404; font-size: 1.1em;">General Private Notes</h3>
                     <form id="notesForm">
-                        <textarea id="private_notes" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace; resize: vertical;"><?= Security::escape($data['appointment']->private_notes ?? '') ?></textarea>
-                        <button type="button" id="saveNotesBtn" class="btn" style="background: #28a745; margin-top: 10px; padding: 5px 10px; font-size: 0.85em;">Save Notes</button>
+                        <textarea id="private_notes" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace; resize: vertical;"><?= Security::escape($data['appointment']->private_notes ?? '') ?></textarea>
+                        <button type="button" id="saveNotesBtn" class="btn" style="background: #28a745; margin-top: 10px; padding: 5px 10px; font-size: 0.85em;">Save General Notes</button>
                         <span id="notesStatus" style="font-size: 0.8em; color: green; margin-left: 10px; display: none;">Saved!</span>
                     </form>
                 </div>
+
                 <script>
+                    document.getElementById('saveSoapBtn').addEventListener('click', function() {
+                        let csrf = document.getElementById('chat_csrf') ? document.getElementById('chat_csrf').value : '<?= Security::generateCSRFToken() ?>';
+                        let statusSpan = document.getElementById('soapStatus');
+
+                        let formData = new FormData();
+                        formData.append('appointment_id', <?= $data['appointment']->id ?>);
+                        formData.append('subjective', document.getElementById('soap_s').value);
+                        formData.append('objective', document.getElementById('soap_o').value);
+                        formData.append('assessment', document.getElementById('soap_a').value);
+                        formData.append('plan', document.getElementById('soap_p').value);
+                        formData.append('csrf_token', csrf);
+
+                        fetch('<?= URL_ROOT ?>/appointment/saveSoapNotes', {
+                            method: 'POST',
+                            body: formData
+                        }).then(res => res.json())
+                          .then(data => {
+                            if(data.success) {
+                                statusSpan.style.display = 'inline';
+                                setTimeout(() => { statusSpan.style.display = 'none'; }, 2000);
+                            } else {
+                                alert(data.error || 'Failed to save SOAP notes.');
+                            }
+                        });
+                    });
+
                     document.getElementById('saveNotesBtn').addEventListener('click', function() {
                         let text = document.getElementById('private_notes').value;
-                        let csrf = document.getElementById('chat_csrf') ? document.getElementById('chat_csrf').value : '<?= Security::generateCSRFToken() ?>'; // fallback if chat is hidden
+                        let csrf = document.getElementById('chat_csrf') ? document.getElementById('chat_csrf').value : '<?= Security::generateCSRFToken() ?>';
                         let statusSpan = document.getElementById('notesStatus');
 
                         let formData = new FormData();

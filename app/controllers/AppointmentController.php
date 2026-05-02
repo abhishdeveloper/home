@@ -8,6 +8,39 @@ class AppointmentController extends Controller {
         }
     }
 
+    public function saveSoapNotes() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && Session::get('user_role_id') == 2) {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                echo json_encode(['success' => false, 'error' => 'CSRF Failed']);
+                exit;
+            }
+
+            $appointment_id = (int)$_POST['appointment_id'];
+
+            // Build the JSON payload
+            $soapData = [
+                'subjective' => $_POST['subjective'] ?? '',
+                'objective' => $_POST['objective'] ?? '',
+                'assessment' => $_POST['assessment'] ?? '',
+                'plan' => $_POST['plan'] ?? ''
+            ];
+
+            $soap_json = json_encode($soapData);
+
+            $appointmentModel = $this->model('AppointmentModel');
+            $appt = $appointmentModel->getById($appointment_id);
+
+            if ($appt && $appt->doctor_user_id == Session::get('user_id')) {
+                if ($appointmentModel->updateSoapNotes($appointment_id, $soap_json)) {
+                    echo json_encode(['success' => true]);
+                    exit;
+                }
+            }
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            exit;
+        }
+    }
+
     public function index() {
         $appointmentModel = $this->model('AppointmentModel');
         $role_id = Session::get('user_role_id');

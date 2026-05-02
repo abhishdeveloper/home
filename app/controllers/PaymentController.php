@@ -98,16 +98,18 @@ class PaymentController extends Controller {
             // Success Flow
             $user_id = Session::get('user_id');
 
-            // 1. Record Transaction
-            $this->model('ClinicModel')->db->query('INSERT INTO payments (user_id, payment_type, reference_id, base_amount, tax_amount, platform_fee, total_amount, status) VALUES (:user_id, :type, :ref_id, :base, :tax, :plat, :total, "success")');
-            $this->model('ClinicModel')->db->bind(':user_id', $user_id);
-            $this->model('ClinicModel')->db->bind(':type', $type);
-            $this->model('ClinicModel')->db->bind(':ref_id', $ref_id);
-            $this->model('ClinicModel')->db->bind(':base', $base_amount);
-            $this->model('ClinicModel')->db->bind(':tax', $tax_amount);
-            $this->model('ClinicModel')->db->bind(':plat', $platform_fee);
-            $this->model('ClinicModel')->db->bind(':total', $total_amount);
-            $this->model('ClinicModel')->db->execute();
+            // 1. Record Transaction properly through Model
+            $paymentData = [
+                'user_id' => $user_id,
+                'payment_type' => $type,
+                'reference_id' => $ref_id,
+                'base_amount' => $base_amount,
+                'tax_amount' => $tax_amount,
+                'platform_fee' => $platform_fee,
+                'total_amount' => $total_amount
+            ];
+            $clinicModel = $this->model('ClinicModel');
+            $clinicModel->recordPayment($paymentData);
 
             // 2. Handle Entity Logic
             if ($type == 'profile_upgrade') {

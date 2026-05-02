@@ -13,6 +13,9 @@ class AssessmentController extends Controller {
 
     public function prakruti() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
             $vata = 0; $pitta = 0; $kapha = 0;
 
             // Simple tally of selected radio buttons
@@ -46,6 +49,9 @@ class AssessmentController extends Controller {
 
     public function psychological() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
             $score = 0;
             if (isset($_POST['q'])) {
                 foreach ($_POST['q'] as $val) {
@@ -77,6 +83,9 @@ class AssessmentController extends Controller {
 
     public function personality() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
             // Simplified Big 5 trait extraction
             $traits = [
                 'Openness' => (int)($_POST['openness'] ?? 0),

@@ -216,6 +216,10 @@ class AuthController extends Controller {
             die('Google Login is not configured yet. Please contact the administrator.');
         }
 
+        // Generate a random state token for CSRF protection
+        $state = bin2hex(random_bytes(16));
+        Session::set('oauth2state', $state);
+
         $redirect_uri = URL_ROOT . '/auth/googleCallback';
         $scope = 'email profile';
 
@@ -225,12 +229,19 @@ class AuthController extends Controller {
         $url .= '&response_type=code';
         $url .= '&scope=' . urlencode($scope);
         $url .= '&access_type=online';
+        $url .= '&state=' . urlencode($state);
 
         header('Location: ' . $url);
         exit;
     }
 
     public function googleCallback() {
+        // Verify state to prevent Login CSRF
+        if (empty($_GET['state']) || ($_GET['state'] !== Session::get('oauth2state'))) {
+            Session::set('oauth2state', null); // Unset the state
+            die('Invalid OAuth state. Please try logging in again.');
+        }
+
         if (!isset($_GET['code'])) {
             header('Location: ' . URL_ROOT . '/auth/login');
             exit;

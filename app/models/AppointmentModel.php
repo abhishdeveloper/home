@@ -70,6 +70,13 @@ class AppointmentModel {
         return $this->db->execute();
     }
 
+    public function updateSoapNotes($id, $soap_json) {
+        $this->db->query('UPDATE appointments SET soap_notes = :soap_notes WHERE id = :id');
+        $this->db->bind(':soap_notes', $soap_json);
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+
     public function updatePrivateNotes($id, $notes) {
         $this->db->query('UPDATE appointments SET private_notes = :notes WHERE id = :id');
         $this->db->bind(':notes', $notes);

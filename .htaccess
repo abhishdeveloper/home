@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Explicitly route sitemap.xml to SitemapController through the public index
+    RewriteRule ^sitemap\.xml$ public/index.php?url=sitemap/index [L]
+
     # If the request is not for a real file or directory
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

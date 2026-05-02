@@ -97,10 +97,15 @@ class ClinicModel {
         return $this->db->execute();
     }
 
-    public function recordTransaction($clinic_id, $amount) {
-        $this->db->query('INSERT INTO billing_transactions (clinic_id, amount, status) VALUES (:clinic_id, :amount, "completed")');
-        $this->db->bind(':clinic_id', $clinic_id);
-        $this->db->bind(':amount', $amount);
+    public function recordPayment($data) {
+        $this->db->query('INSERT INTO payments (user_id, payment_type, reference_id, base_amount, tax_amount, platform_fee, total_amount, status) VALUES (:user_id, :type, :ref_id, :base, :tax, :plat, :total, "success")');
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':type', $data['payment_type']);
+        $this->db->bind(':ref_id', $data['reference_id']);
+        $this->db->bind(':base', $data['base_amount']);
+        $this->db->bind(':tax', $data['tax_amount']);
+        $this->db->bind(':plat', $data['platform_fee']);
+        $this->db->bind(':total', $data['total_amount']);
         return $this->db->execute();
     }
 
