@@ -136,17 +136,75 @@ class ClinicController extends Controller {
                 exit;
             }
 
+            $clinic_id = (int)$_POST['clinic_id'];
+            $appointment_date = trim($_POST['appointment_date']);
+            $appointment_time = trim($_POST['appointment_time']);
+
+            // Validate that the slot is actually available on the backend
+            $scheduleModel = $this->model('ScheduleModel');
+            $appointmentModel = $this->model('AppointmentModel');
+            $schedule = $scheduleModel->getScheduleByClinicId($clinic_id);
+
+            if (!$schedule) {
+                echo json_encode(['success' => false, 'error' => 'Clinic schedule is not set.']);
+                exit;
+            }
+
+            $dayOfWeek = strtolower(date('l', strtotime($appointment_date)));
+            $startCol = $dayOfWeek . '_start';
+            $endCol = $dayOfWeek . '_end';
+
+            if (empty($schedule->$startCol) || empty($schedule->$endCol)) {
+                echo json_encode(['success' => false, 'error' => 'Clinic is closed on this day.']);
+                exit;
+            }
+
+            $startTime = strtotime($schedule->$startCol);
+            $endTime = strtotime($schedule->$endCol);
+            $duration = $schedule->slot_duration * 60;
+            $bookedTimes = $appointmentModel->getBookedTimes($clinic_id, $appointment_date);
+
+            $isValidSlot = false;
+            while ($startTime + $duration <= $endTime) {
+                $timeString = date('H:i', $startTime);
+                if ($timeString === substr($appointment_time, 0, 5) && !in_array($timeString, $bookedTimes)) {
+                    // Check if time is in the past
+                    if ($appointment_date > date('Y-m-d') || ($appointment_date == date('Y-m-d') && $startTime > time())) {
+                        $isValidSlot = true;
+                    }
+                    break;
+                }
+                $startTime += $duration;
+            }
+
+            if (!$isValidSlot) {
+                echo json_encode(['success' => false, 'error' => 'Invalid or already booked time slot.']);
+                exit;
+            }
+
             $data = [
                 'patient_id' => Session::get('user_id'),
-                'clinic_id' => (int)$_POST['clinic_id'],
-                'appointment_date' => $_POST['appointment_date'],
-                'appointment_time' => $_POST['appointment_time']
+                'clinic_id' => $clinic_id,
+                'appointment_date' => $appointment_date,
+                'appointment_time' => $appointment_time
             ];
 
-            // Should verify the slot is still available, but for now we just insert
-            $appointmentModel = $this->model('AppointmentModel');
-
             if ($appointmentModel->createAppointment($data)) {
+                // Email Clinic
+                $clinicModel = $this->model('ClinicModel');
+                // The $_POST['clinic_id'] is actually the clinic profile ID in our schema
+                $profileRow = $clinicModel->getProfileById((int)$_POST['clinic_id']);
+
+                if ($profileRow) {
+                    $userModel = $this->model('UserModel');
+                    $clinicUser = $userModel->findUserById($profileRow->user_id);
+                    if ($clinicUser) {
+                        $subject = "New Appointment Request";
+                        $body = "<h2>New Appointment Request</h2><p>You have a new appointment request for {$data['appointment_date']} at {$data['appointment_time']}.</p><p>Please log in to your dashboard to approve or reject it.</p>";
+                        EmailHelper::sendEmail($clinicUser->email, $subject, $body);
+                    }
+                }
+
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Failed to book appointment.']);

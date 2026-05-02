@@ -58,12 +58,8 @@ class UserModel {
     // Register Google User (Initial Step without Role)
     // Returns the new user ID
     public function registerGoogleUser($name, $email, $google_id) {
-        // We will insert with a temporary dummy role or null if role_id allowed null.
-        // Assuming role_id must be set, let's just default to 3 (Patient) and let them change it,
-        // OR better yet, we will force an update before their session is considered fully authenticated.
-
-        // Actually, we'll assign role 3 by default, and update it later in the setup form.
-        $this->db->query('INSERT INTO users (name, email, google_id, role_id) VALUES(:name, :email, :google_id, 3)');
+        // We insert with a dummy role of 0 (Requires them to choose role before proceeding)
+        $this->db->query('INSERT INTO users (name, email, google_id, role_id) VALUES(:name, :email, :google_id, 0)');
 
         $this->db->bind(':name', $name);
         $this->db->bind(':email', $email);

@@ -52,6 +52,20 @@ class AppointmentController extends Controller {
             if ($appt && $profile && $appt->clinic_id == $profile->id) {
                 if (in_array($status, ['approved', 'rejected', 'completed'])) {
                     $appointmentModel->updateStatus($appointment_id, $status);
+
+                    // Send Email to Patient
+                    $userModel = $this->model('UserModel');
+                    $patientUser = $userModel->findUserById($appt->patient_id);
+                    if ($patientUser) {
+                        $subject = "Appointment Status Updated";
+                        $body = "<h2>Appointment {$status}</h2><p>Your appointment with {$profile->clinic_name} on {$appt->appointment_date} at {$appt->appointment_time} has been marked as <strong>{$status}</strong>.</p>";
+
+                        if ($status == 'approved') {
+                            $body .= "<p>You can now log in to access the secure chat and video call link.</p>";
+                        }
+
+                        EmailHelper::sendEmail($patientUser->email, $subject, $body);
+                    }
                 }
             }
 
@@ -96,11 +110,16 @@ class AppointmentController extends Controller {
 
     public function sendMessage() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                echo json_encode(['success' => false, 'error' => 'CSRF Token Validation Failed']);
+                exit;
+            }
+
             $appointment_id = (int)$_POST['appointment_id'];
             $message = trim($_POST['message']);
 
             if (empty($message)) {
-                echo json_encode(['success' => false]);
+                echo json_encode(['success' => false, 'error' => 'Message is empty']);
                 exit;
             }
 
@@ -113,7 +132,7 @@ class AppointmentController extends Controller {
                     exit;
                 }
             }
-            echo json_encode(['success' => false]);
+            echo json_encode(['success' => false, 'error' => 'Unauthorized or failed to send']);
             exit;
         }
     }

@@ -18,8 +18,19 @@
             <h2><?= SITE_NAME ?></h2>
             <nav class="nav">
                 <a href="<?= URL_ROOT ?>/pages/index">Home</a>
-                <a href="<?= URL_ROOT ?>/auth/login">Login</a>
-                <a href="<?= URL_ROOT ?>/auth/register">Register</a>
+                <a href="<?= URL_ROOT ?>/directory">Directory</a>
+                <?php if (Session::get('user_id')): ?>
+                    <?php if(Session::get('user_role_id') == 2): ?>
+                        <a href="<?= URL_ROOT ?>/clinicDashboard">Dashboard</a>
+                    <?php endif; ?>
+                    <?php if(Session::get('user_role_id') == 3): ?>
+                        <a href="<?= URL_ROOT ?>/appointment">My Appointments</a>
+                    <?php endif; ?>
+                    <a href="<?= URL_ROOT ?>/auth/logout">Logout</a>
+                <?php else: ?>
+                    <a href="<?= URL_ROOT ?>/auth/login">Login</a>
+                    <a href="<?= URL_ROOT ?>/auth/register">Register</a>
+                <?php endif; ?>
             </nav>
         </header>
 

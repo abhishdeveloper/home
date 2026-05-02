@@ -18,6 +18,12 @@ class ClinicModel {
         return $this->db->single();
     }
 
+    public function getProfileById($id) {
+        $this->db->query('SELECT * FROM clinic_profiles WHERE id = :id');
+        $this->db->bind(':id', $id);
+        return $this->db->single();
+    }
+
     public function checkSlugExists($slug, $exclude_user_id = null) {
         $query = 'SELECT id FROM clinic_profiles WHERE slug = :slug';
         if ($exclude_user_id) {
@@ -80,8 +86,12 @@ class ClinicModel {
         return $this->db->resultSet();
     }
 
-    public function getPageBySlug($clinic_id, $slug) {
-        $this->db->query('SELECT * FROM clinic_pages WHERE clinic_id = :clinic_id AND slug = :slug AND status = "published"');
+    public function getPageBySlug($clinic_id, $slug, $published_only = true) {
+        $query = 'SELECT * FROM clinic_pages WHERE clinic_id = :clinic_id AND slug = :slug';
+        if ($published_only) {
+            $query .= ' AND status = "published"';
+        }
+        $this->db->query($query);
         $this->db->bind(':clinic_id', $clinic_id);
         $this->db->bind(':slug', $slug);
         return $this->db->single();

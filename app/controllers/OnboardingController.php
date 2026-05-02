@@ -68,12 +68,10 @@ class OnboardingController extends Controller {
                 die('CSRF Token Validation Failed');
             }
 
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
             $profileData = [
                 'user_id' => Session::get('user_id'),
                 'age' => !empty($_POST['age']) ? (int)$_POST['age'] : null,
-                'address' => trim($_POST['address']),
+                'address' => trim(htmlspecialchars($_POST['address'] ?? '')),
                 'preferred_specialty_id' => !empty($_POST['preferred_specialty_id']) ? (int)$_POST['preferred_specialty_id'] : null
             ];
 
@@ -132,18 +130,16 @@ class OnboardingController extends Controller {
                 die('CSRF Token Validation Failed');
             }
 
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-            $data['slug'] = trim(strtolower(preg_replace('/[^a-zA-Z0-9-]/', '-', $_POST['slug'])));
-            $data['clinic_name'] = trim($_POST['clinic_name']);
+            $data['slug'] = trim(strtolower(preg_replace('/[^a-zA-Z0-9-]/', '-', $_POST['slug'] ?? '')));
+            $data['clinic_name'] = trim(htmlspecialchars($_POST['clinic_name'] ?? ''));
             $data['specialty_id'] = !empty($_POST['specialty_id']) ? (int)$_POST['specialty_id'] : null;
             $data['theme_id'] = !empty($_POST['theme_id']) ? (int)$_POST['theme_id'] : null;
-            $data['primary_color'] = trim($_POST['primary_color']);
-            $data['address'] = trim($_POST['address']);
-            $data['phone'] = trim($_POST['phone']);
-            $data['whatsapp'] = trim($_POST['whatsapp']);
-            $data['facebook'] = trim($_POST['facebook']);
-            $data['instagram'] = trim($_POST['instagram']);
+            $data['primary_color'] = trim(htmlspecialchars($_POST['primary_color'] ?? ''));
+            $data['address'] = trim(htmlspecialchars($_POST['address'] ?? ''));
+            $data['phone'] = trim(htmlspecialchars($_POST['phone'] ?? ''));
+            $data['whatsapp'] = trim(htmlspecialchars($_POST['whatsapp'] ?? ''));
+            $data['facebook'] = trim(htmlspecialchars($_POST['facebook'] ?? ''));
+            $data['instagram'] = trim(htmlspecialchars($_POST['instagram'] ?? ''));
 
             // Validate
             if (empty($data['slug'])) {

@@ -63,6 +63,7 @@
                     <!-- Loaded via AJAX -->
                 </div>
                 <div class="chat-input-area">
+                    <input type="hidden" id="chat_csrf" value="<?= Security::generateCSRFToken() ?>">
                     <input type="text" id="chat_input" placeholder="Type a message...">
                     <button type="button" id="send_btn">Send</button>
                 </div>
@@ -103,18 +104,25 @@
 
                 sendBtn.addEventListener('click', function() {
                     let text = chatInput.value.trim();
+                    let csrf = document.getElementById('chat_csrf').value;
                     if (!text) return;
 
                     let formData = new FormData();
                     formData.append('appointment_id', appointmentId);
                     formData.append('message', text);
+                    formData.append('csrf_token', csrf);
 
                     fetch('<?= URL_ROOT ?>/appointment/sendMessage', {
                         method: 'POST',
                         body: formData
-                    }).then(() => {
-                        chatInput.value = '';
-                        fetchMessages();
+                    }).then(res => res.json())
+                      .then(data => {
+                        if(data.success) {
+                            chatInput.value = '';
+                            fetchMessages();
+                        } else {
+                            alert(data.error || 'Failed to send message.');
+                        }
                     });
                 });
 

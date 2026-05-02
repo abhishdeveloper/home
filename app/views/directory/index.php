@@ -23,6 +23,9 @@
             <nav>
                 <a href="<?= URL_ROOT ?>/pages/index">Home</a>
                 <?php if(Session::get('user_id')): ?>
+                    <?php if(Session::get('user_role_id') == 3): ?>
+                        | <a href="<?= URL_ROOT ?>/appointment">My Appointments</a>
+                    <?php endif; ?>
                     | <a href="<?= URL_ROOT ?>/auth/logout">Logout</a>
                 <?php else: ?>
                     | <a href="<?= URL_ROOT ?>/auth/login">Login</a>

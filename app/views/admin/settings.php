@@ -43,6 +43,29 @@
                 <input type="text" name="client_secret" id="client_secret" value="<?= Security::escape($data['client_secret'] ?? '') ?>" required>
             </div>
 
+            <hr style="margin: 30px 0;">
+            <h3>SMTP Email Settings (Google SMTP)</h3>
+
+            <div class="form-group">
+                <label for="smtp_host">SMTP Host</label>
+                <input type="text" name="smtp_host" id="smtp_host" value="<?= Security::escape($data['smtp_host'] ?? '') ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="smtp_user">SMTP Username (Gmail Address)</label>
+                <input type="email" name="smtp_user" id="smtp_user" value="<?= Security::escape($data['smtp_user'] ?? '') ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="smtp_pass">SMTP Password (App Password)</label>
+                <input type="password" name="smtp_pass" id="smtp_pass" value="<?= Security::escape($data['smtp_pass'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="smtp_port">SMTP Port</label>
+                <input type="text" name="smtp_port" id="smtp_port" value="<?= Security::escape($data['smtp_port'] ?? '587') ?>" required>
+            </div>
+
             <button type="submit">Save Settings</button>
         </form>
     </div>

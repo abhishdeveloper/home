@@ -33,13 +33,12 @@ class AuthController extends Controller {
             }
 
             // Sanitize POST data
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-            $data['name'] = trim($_POST['name']);
-            $data['email'] = trim($_POST['email']);
-            $data['password'] = trim($_POST['password']);
-            $data['confirm_password'] = trim($_POST['confirm_password']);
-            $data['role_id'] = (int) $_POST['role_id'];
+            $data['name'] = trim(htmlspecialchars($_POST['name'] ?? ''));
+            $data['email'] = trim(filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL));
+            // Passwords should not be aggressively filtered to allow special chars
+            $data['password'] = trim($_POST['password'] ?? '');
+            $data['confirm_password'] = trim($_POST['confirm_password'] ?? '');
+            $data['role_id'] = (int) ($_POST['role_id'] ?? 3);
 
             // Validation
             if (empty($data['email'])) {
@@ -73,6 +72,11 @@ class AuthController extends Controller {
                 $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
 
                 if ($this->userModel->register($data)) {
+                    // Send Welcome Email
+                    $subject = "Welcome to " . SITE_NAME;
+                    $body = "<h2>Hello {$data['name']},</h2><p>Welcome to our platform! Your account has been successfully created.</p>";
+                    EmailHelper::sendEmail($data['email'], $subject, $body);
+
                     if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                         header('Content-Type: application/json');
                         echo json_encode(['success' => true, 'redirect' => URL_ROOT . '/auth/login']);
@@ -124,10 +128,8 @@ class AuthController extends Controller {
                 die('CSRF Token Validation Failed');
             }
 
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-            $data['email'] = trim($_POST['email']);
-            $data['password'] = trim($_POST['password']);
+            $data['email'] = trim(filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL));
+            $data['password'] = trim($_POST['password'] ?? '');
 
             if (empty($data['email'])) {
                 $data['email_err'] = 'Please enter email';
@@ -278,7 +280,15 @@ class AuthController extends Controller {
         $existingUser = $this->userModel->findUserByGoogleId($google_id);
 
         if ($existingUser) {
-            $this->createUserSession($existingUser);
+            if ($existingUser->role_id == 0) {
+                // They never finished choosing their role
+                Session::set('pending_role_user_id', $existingUser->id);
+                Session::set('pending_role_name', $existingUser->name);
+                header('Location: ' . URL_ROOT . '/auth/chooseRole');
+                exit;
+            } else {
+                $this->createUserSession($existingUser);
+            }
         } else {
             // Check if email already exists but not linked to Google
             $existingEmailUser = $this->userModel->findUserByEmail($email);
@@ -286,7 +296,14 @@ class AuthController extends Controller {
                 // Link accounts by updating google_id
                 $this->userModel->linkGoogleAccount($existingEmailUser->id, $google_id);
 
-                $this->createUserSession($existingEmailUser);
+                if ($existingEmailUser->role_id == 0) {
+                    Session::set('pending_role_user_id', $existingEmailUser->id);
+                    Session::set('pending_role_name', $existingEmailUser->name);
+                    header('Location: ' . URL_ROOT . '/auth/chooseRole');
+                    exit;
+                } else {
+                    $this->createUserSession($existingEmailUser);
+                }
             } else {
                 // New user via Google - Register them
                 $newUserId = $this->userModel->registerGoogleUser($name, $email, $google_id);

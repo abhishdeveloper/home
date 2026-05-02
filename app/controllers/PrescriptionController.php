@@ -82,6 +82,15 @@ class PrescriptionController extends Controller {
             ];
 
             if ($prescriptionModel->savePrescription($prescData)) {
+                // Email Patient
+                $userModel = $this->model('UserModel');
+                $patientUser = $userModel->findUserById($appt->patient_id);
+                if ($patientUser) {
+                    $subject = "Your Prescription is Ready";
+                    $body = "<h2>Prescription Available</h2><p>Your prescription from {$profile->clinic_name} is now available.</p><p><a href='" . URL_ROOT . "/prescription/view/{$appointment_id}'>Click here to view and download it.</a></p>";
+                    EmailHelper::sendEmail($patientUser->email, $subject, $body);
+                }
+
                 header('Location: ' . URL_ROOT . '/prescription/view/' . $appointment_id);
                 exit;
             } else {

@@ -22,7 +22,14 @@ CREATE TABLE IF NOT EXISTS users (
 -- Default Admin Account (password is 'password' hashed with bcrypt)
 -- You should change this after first login
 INSERT INTO users (email, password, role_id, name) VALUES
-('admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'Super Admin');
+('admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'Super Admin'),
+('doctor@nareshdalal.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Dr. Naresh Dalal');
+
+-- We can't safely pre-populate clinic_profiles here without a known user_id for Dr. Naresh Dalal
+-- but we can ensure the admin account is set. The user will set up their profile using the UI with:
+-- Name: Dr. Naresh Dalal Hospital
+-- Location: Jhajjar, Haryana
+-- Phone: +918199861552
 
 CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,9 +38,14 @@ CREATE TABLE IF NOT EXISTS settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Insert default keys for Google OAuth
+-- Insert default keys for Google OAuth and SMTP
 INSERT INTO settings (setting_key, setting_value) VALUES
 ('google_client_id', ''),
-('google_client_secret', '');
+('google_client_secret', ''),
+('smtp_host', 'smtp.gmail.com'),
+('smtp_user', ''),
+('smtp_pass', ''),
+('smtp_port', '587');
 
 -- Medical Specialties / Categories
 CREATE TABLE IF NOT EXISTS specialties (
