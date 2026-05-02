@@ -58,30 +58,49 @@
             </div>
         </div>
 
-        <div class="card">
-            <h3 style="margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 10px; display: inline-block;">Upcoming Approved Appointments</h3>
+        <div class="card-row">
+            <div class="card" style="flex: 2;">
+                <h3 style="margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 10px; display: inline-block;">Upcoming Approved Appointments</h3>
 
-            <?php if (empty($data['upcoming_appointments'])): ?>
-                <p style="color: #666; margin-top: 20px;">You have no upcoming appointments scheduled.</p>
-                <a href="<?= URL_ROOT ?>/directory" style="color: #007bff; font-weight: bold; text-decoration: none;">&rarr; Browse directory to book one</a>
-            <?php else: ?>
-                <div style="margin-top: 15px;">
-                    <?php foreach ($data['upcoming_appointments'] as $appt): ?>
-                        <div class="appt-item">
-                            <div>
-                                <strong style="font-size: 1.1em;"><?= Security::escape($appt->clinic_name) ?></strong><br>
-                                <span style="color: #666; font-size: 0.9em;">
-                                    📅 <?= date('l, M d, Y', strtotime($appt->appointment_date)) ?> at
-                                    ⏰ <?= date('h:i A', strtotime($appt->appointment_time)) ?>
-                                </span>
+                <?php if (empty($data['upcoming_appointments'])): ?>
+                    <p style="color: #666; margin-top: 20px;">You have no upcoming appointments scheduled.</p>
+                    <a href="<?= URL_ROOT ?>/directory" style="color: #007bff; font-weight: bold; text-decoration: none;">&rarr; Browse directory to book one</a>
+                <?php else: ?>
+                    <div style="margin-top: 15px;">
+                        <?php foreach ($data['upcoming_appointments'] as $appt): ?>
+                            <div class="appt-item">
+                                <div>
+                                    <strong style="font-size: 1.1em;"><?= Security::escape($appt->clinic_name) ?></strong><br>
+                                    <span style="color: #666; font-size: 0.9em;">
+                                        📅 <?= date('l, M d, Y', strtotime($appt->appointment_date)) ?> at
+                                        ⏰ <?= date('h:i A', strtotime($appt->appointment_time)) ?>
+                                    </span>
+                                </div>
+                                <div>
+                                    <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn-sm">Enter Virtual Lobby</a>
+                                </div>
                             </div>
-                            <div>
-                                <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn-sm">Enter Virtual Lobby</a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="card" style="flex: 1; background: #eef5ff;">
+                <h3 style="margin-top: 0; color: #0056b3;">Medical Assessments</h3>
+                <p style="font-size: 0.9em; color: #555;">Complete these health profiles to help your doctors understand you better.</p>
+
+                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <a href="<?= URL_ROOT ?>/assessment/prakruti" class="btn-sm" style="background: #28a745; text-align: center;">
+                        <?= !empty($data['profile']->prakruti_assessment) ? 'Update' : 'Take' ?> Prakruti Pariksha
+                    </a>
+                    <a href="<?= URL_ROOT ?>/assessment/psychological" class="btn-sm" style="background: #17a2b8; text-align: center;">
+                        <?= !empty($data['profile']->psychological_assessment) ? 'Update' : 'Take' ?> Psychological Exam
+                    </a>
+                    <a href="<?= URL_ROOT ?>/assessment/personality" class="btn-sm" style="background: #6f42c1; text-align: center;">
+                        <?= !empty($data['profile']->personality_assessment) ? 'Update' : 'Take' ?> Personality Exam
+                    </a>
                 </div>
-            <?php endif; ?>
+            </div>
         </div>
 
     </div>

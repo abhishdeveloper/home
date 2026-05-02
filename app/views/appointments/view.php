@@ -260,8 +260,46 @@
                 <?php endif; ?>
             </ul>
 
-            <?php if (Session::get('user_role_id') == 2): // Doctor Private Notes ?>
-                <div style="margin-top: 40px; background: #fff8e1; border: 1px solid #ffeeba; border-radius: 5px; padding: 15px;">
+            <?php if (Session::get('user_role_id') == 2): // Doctor Private Notes & Assessments ?>
+                <div style="margin-top: 40px; background: #eef5ff; border: 1px solid #cce5ff; border-radius: 5px; padding: 15px;">
+                    <h3 style="margin-top: 0; color: #004085; font-size: 1.1em; border-bottom: 2px solid #004085; padding-bottom: 5px;">Patient Medical Assessments</h3>
+
+                    <?php
+                    $pp = $data['patientProfile'];
+                    if (!$pp || (empty($pp->prakruti_assessment) && empty($pp->psychological_assessment) && empty($pp->personality_assessment))):
+                    ?>
+                        <p style="font-size: 0.9em; color: #666;">The patient has not completed any medical assessments yet.</p>
+                    <?php else: ?>
+                        <?php if (!empty($pp->prakruti_assessment)): $pr = json_decode($pp->prakruti_assessment); ?>
+                            <div style="margin-bottom: 15px;">
+                                <strong style="color: #28a745;">Ayurvedic Prakruti:</strong><br>
+                                Dominant Dosha: <strong><?= Security::escape($pr->dominant_dosha) ?></strong><br>
+                                <span style="font-size: 0.85em; color: #555;">(Vata: <?= $pr->scores->Vata ?? 0 ?>, Pitta: <?= $pr->scores->Pitta ?? 0 ?>, Kapha: <?= $pr->scores->Kapha ?? 0 ?>)</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($pp->psychological_assessment)): $ps = json_decode($pp->psychological_assessment); ?>
+                            <div style="margin-bottom: 15px;">
+                                <strong style="color: #17a2b8;">Psychological State:</strong><br>
+                                Severity: <strong><?= Security::escape($ps->severity) ?></strong><br>
+                                <span style="font-size: 0.85em; color: #555;">(Score: <?= $ps->score ?>/12)</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($pp->personality_assessment)): $pe = json_decode($pp->personality_assessment); ?>
+                            <div style="margin-bottom: 15px;">
+                                <strong style="color: #6f42c1;">Personality Profile (Big 5):</strong><br>
+                                <div style="font-size: 0.85em; color: #555; display: grid; grid-template-columns: 1fr 1fr;">
+                                    <?php foreach($pe->traits as $trait => $score): ?>
+                                        <div><?= Security::escape($trait) ?>: <?= (int)$score ?>/5</div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+
+                <div style="margin-top: 20px; background: #fff8e1; border: 1px solid #ffeeba; border-radius: 5px; padding: 15px;">
                     <h3 style="margin-top: 0; color: #856404; font-size: 1.1em;">Private Medical Notes</h3>
                     <p style="font-size: 0.85em; color: #666;">These notes are only visible to you.</p>
                     <form id="notesForm">

@@ -93,12 +93,16 @@ class AppointmentController extends Controller {
 
         $attachments = $appointmentModel->getAttachments($id);
 
+        $patientModel = $this->model('PatientModel');
+        $patientProfile = $patientModel->getProfileByUserId($appt->patient_id);
+
         $data = [
             'appointment' => $appt,
             'patientReview' => $patientReview,
             'clinicReview' => $clinicReview,
             'attachments' => $attachments,
-            'attachment_error' => ''
+            'attachment_error' => '',
+            'patientProfile' => $patientProfile
         ];
 
         // Handle attachment upload

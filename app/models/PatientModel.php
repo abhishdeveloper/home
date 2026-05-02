@@ -33,4 +33,18 @@ class PatientModel {
 
         return $this->db->execute();
     }
+
+    public function updateAssessment($user_id, $column, $json_data) {
+        // Safe-list the allowed columns to prevent SQL injection on column name
+        $allowed = ['prakruti_assessment', 'psychological_assessment', 'personality_assessment'];
+        if (!in_array($column, $allowed)) {
+            return false;
+        }
+
+        $this->db->query("UPDATE patient_profiles SET {$column} = :data WHERE user_id = :user_id");
+        $this->db->bind(':data', $json_data);
+        $this->db->bind(':user_id', $user_id);
+
+        return $this->db->execute();
+    }
 }
