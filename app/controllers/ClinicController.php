@@ -57,6 +57,22 @@ class ClinicController extends Controller {
         $clinicReviews = $reviewModel->getReviewsForClinic($profile->id);
         $avgRating = $reviewModel->getClinicAverageRating($profile->id);
 
+        // Generate SEO Data
+        $specialtyName = $profile->specialty_id ? $this->model('SpecialtyModel')->getAll() : null; // Quick hack to get name, ideally fetch specific
+        $specNameStr = 'Doctor';
+        if ($specialtyName) {
+            foreach ($specialtyName as $s) {
+                if ($s->id == $profile->specialty_id) {
+                    $specNameStr = $s->name;
+                    break;
+                }
+            }
+        }
+
+        $metaTitle = $profile->clinic_name . ' - ' . ($currentPage ? $currentPage->title : 'Home');
+        $metaDesc = "Book an appointment with " . $profile->clinic_name . ", a top-rated " . strtolower($specNameStr) . " clinic. View services, reviews, and book instantly online.";
+        $metaKeywords = strtolower($specNameStr) . ", " . strtolower($profile->clinic_name) . ", book appointment, doctor, clinic";
+
         $data = [
             'profile' => $profile,
             'theme' => $theme,
@@ -64,7 +80,12 @@ class ClinicController extends Controller {
             'current_page' => $currentPage,
             'schedule' => $schedule,
             'reviews' => $clinicReviews,
-            'avgRating' => $avgRating
+            'avgRating' => $avgRating,
+            'title' => $metaTitle,
+            'meta_desc' => $metaDesc,
+            'meta_keywords' => $metaKeywords,
+            'og_image' => $profile->logo_url ? $profile->logo_url : null,
+            'specialty_name' => $specNameStr
         ];
 
         $this->view('clinic/public_view', $data);

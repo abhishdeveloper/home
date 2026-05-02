@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /clinicDashboard/
+Disallow: /patientDashboard/
+Disallow: /appointment/
+Disallow: /prescription/
+Disallow: /billing/
+
+Sitemap: /sitemap.xml

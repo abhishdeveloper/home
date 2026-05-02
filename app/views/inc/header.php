@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Dynamic SEO Meta Tags -->
     <title><?= isset($data['title']) ? Security::escape($data['title']) . ' - ' . SITE_NAME : SITE_NAME ?></title>
+    <meta name="description" content="<?= isset($data['meta_desc']) ? Security::escape($data['meta_desc']) : 'Find top-rated doctors and clinics near you. Book appointments instantly.' ?>">
+    <meta name="keywords" content="<?= isset($data['meta_keywords']) ? Security::escape($data['meta_keywords']) : 'doctor, clinic, medical directory, book appointment, healthcare' ?>">
+
+    <!-- Open Graph (Social Media) -->
+    <meta property="og:title" content="<?= isset($data['title']) ? Security::escape($data['title']) . ' - ' . SITE_NAME : SITE_NAME ?>">
+    <meta property="og:description" content="<?= isset($data['meta_desc']) ? Security::escape($data['meta_desc']) : 'Find top-rated doctors and clinics near you. Book appointments instantly.' ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= URL_ROOT . $_SERVER['REQUEST_URI'] ?>">
+    <?php if (isset($data['og_image'])): ?>
+        <meta property="og:image" content="<?= URL_ROOT . Security::escape($data['og_image']) ?>">
+    <?php endif; ?>
+
     <style>
         * { box-sizing: border-box; }
         img { max-width: 100%; height: auto; }

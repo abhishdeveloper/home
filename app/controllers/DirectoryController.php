@@ -59,12 +59,33 @@ class DirectoryController extends Controller {
             }
         }
 
+        // Advanced SEO Meta Tags
+        $metaTitle = 'Find Top Doctors and Clinics Near You | Directory';
+        $metaDesc = 'Search our comprehensive medical directory to find top-rated doctors and clinics. Book appointments instantly online for free.';
+
+        if ($search_specialty_id) {
+            $specialties = $specialtyModel->getAll();
+            $specName = '';
+            foreach ($specialties as $spec) {
+                if ($spec->id == $search_specialty_id) {
+                    $specName = $spec->name;
+                    break;
+                }
+            }
+            if ($specName) {
+                $metaTitle = "Best {$specName} Doctors and Clinics | Directory";
+                $metaDesc = "Find and book top-rated {$specName} specialists near you. Read patient reviews and schedule your visit instantly.";
+            }
+        }
+
         $data = [
             'clinics' => $clinics,
             'fallback_msg' => $fallback_msg,
             'specialties' => $specialtyModel->getAll(),
             'current_q' => $search_query ?? '',
-            'current_specialty' => $search_specialty_id ?? ''
+            'current_specialty' => $search_specialty_id ?? '',
+            'title' => $metaTitle,
+            'meta_desc' => $metaDesc
         ];
 
         $this->view('directory/index', $data);

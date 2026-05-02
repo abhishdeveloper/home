@@ -44,8 +44,43 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= Security::escape($profile->clinic_name) ?> - <?= $currentPage ? Security::escape($currentPage->title) : 'Home' ?></title>
+    <title><?= Security::escape($data['title']) ?></title>
+    <meta name="description" content="<?= Security::escape($data['meta_desc']) ?>">
+    <meta name="keywords" content="<?= Security::escape($data['meta_keywords']) ?>">
+
+    <meta property="og:title" content="<?= Security::escape($data['title']) ?>">
+    <meta property="og:description" content="<?= Security::escape($data['meta_desc']) ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= URL_ROOT . $_SERVER['REQUEST_URI'] ?>">
+    <?php if (!empty($data['og_image'])): ?>
+        <meta property="og:image" content="<?= URL_ROOT . Security::escape($data['og_image']) ?>">
+    <?php endif; ?>
+
     <link href="https://cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
+
+    <!-- Schema.org JSON-LD Structured Data for Local Business / Physician -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Physician",
+      "name": "<?= Security::escape($profile->clinic_name) ?>",
+      "image": "<?= !empty($profile->logo_url) ? URL_ROOT . Security::escape($profile->logo_url) : '' ?>",
+      "@id": "<?= URL_ROOT . '/clinic/view/' . Security::escape($profile->slug) ?>",
+      "url": "<?= URL_ROOT . '/clinic/view/' . Security::escape($profile->slug) ?>",
+      "telephone": "<?= Security::escape($profile->phone ?? '') ?>",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "<?= Security::escape($profile->address ?? '') ?>"
+      },
+      "medicalSpecialty": "<?= Security::escape($data['specialty_name']) ?>",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "<?= number_format($data['avgRating']->avg_rating ?? 5, 1) ?>",
+        "reviewCount": "<?= max(1, $data['avgRating']->total_reviews ?? 1) ?>"
+      }
+    }
+    </script>
+
     <style>
         <?= $cssVars ?>
         body { font-family: sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: var(--text-color, #333); }
