@@ -24,6 +24,7 @@
                 <p>Public URL: <a href="<?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?>" target="_blank"><?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?></a></p>
             </div>
             <nav>
+                <a href="<?= URL_ROOT ?>/clinicDashboard/schedule" class="btn btn-success">Manage Schedule</a>
                 <a href="<?= URL_ROOT ?>/onboarding/clinic" class="btn btn-warning">Edit Profile Settings</a>
                 <a href="<?= URL_ROOT ?>/auth/logout" class="btn">Logout</a>
             </nav>

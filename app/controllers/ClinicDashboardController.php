@@ -32,6 +32,48 @@ class ClinicDashboardController extends Controller {
         $this->view('clinic/dashboard', $data);
     }
 
+    public function schedule() {
+        $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
+        $scheduleModel = $this->model('ScheduleModel');
+
+        $schedule = $scheduleModel->getScheduleByClinicId($profile->id);
+
+        $data = [
+            'profile' => $profile,
+            'schedule' => $schedule,
+            'success' => '',
+            'error' => ''
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
+                die('CSRF Token Validation Failed');
+            }
+
+            $postData = [
+                'clinic_id' => $profile->id,
+                'slot_duration' => (int)$_POST['slot_duration']
+            ];
+
+            $days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+            foreach ($days as $day) {
+                // Check if they toggled the "Closed" checkbox (if we have one), else just grab the time
+                $postData[$day . '_start'] = !empty($_POST[$day . '_start']) ? $_POST[$day . '_start'] : null;
+                $postData[$day . '_end'] = !empty($_POST[$day . '_end']) ? $_POST[$day . '_end'] : null;
+            }
+
+            if ($scheduleModel->createOrUpdateSchedule($postData)) {
+                $data['success'] = 'Schedule updated successfully.';
+                // Refresh data
+                $data['schedule'] = $scheduleModel->getScheduleByClinicId($profile->id);
+            } else {
+                $data['error'] = 'Failed to update schedule.';
+            }
+        }
+
+        $this->view('clinic/schedule', $data);
+    }
+
     public function togglePublish() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {

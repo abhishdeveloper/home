@@ -108,3 +108,63 @@ CREATE TABLE IF NOT EXISTS clinic_pages (
     FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE,
     UNIQUE KEY unique_clinic_slug (clinic_id, slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Clinic Schedules
+CREATE TABLE IF NOT EXISTS clinic_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    clinic_id INT NOT NULL UNIQUE,
+    slot_duration INT DEFAULT 30, -- Duration in minutes
+    monday_start TIME NULL, monday_end TIME NULL,
+    tuesday_start TIME NULL, tuesday_end TIME NULL,
+    wednesday_start TIME NULL, wednesday_end TIME NULL,
+    thursday_start TIME NULL, thursday_end TIME NULL,
+    friday_start TIME NULL, friday_end TIME NULL,
+    saturday_start TIME NULL, saturday_end TIME NULL,
+    sunday_start TIME NULL, sunday_end TIME NULL,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Appointments
+CREATE TABLE IF NOT EXISTS appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    clinic_id INT NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES patient_profiles(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Appointment Chat Messages
+CREATE TABLE IF NOT EXISTS appointment_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT NOT NULL,
+    sender_id INT NOT NULL, -- references users.id
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Saved Medicines for Clinic
+CREATE TABLE IF NOT EXISTS medicines_inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    clinic_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    default_dosage VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Prescriptions
+CREATE TABLE IF NOT EXISTS prescriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT NOT NULL UNIQUE,
+    medicines_json TEXT NOT NULL, -- JSON array of {name, dosage, notes}
+    general_notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

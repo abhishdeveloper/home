@@ -59,6 +59,12 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
         /* Directory Back Link */
         .directory-bar { background: #eee; padding: 10px; text-align: center; font-size: 0.9em; }
         .directory-bar a { color: #333; text-decoration: none; }
+
+        /* Booking Section */
+        .booking-section { margin-top: 30px; padding: 20px; background: #f1f8ff; border-radius: 5px; border: 1px solid #d0e3ff; }
+        .slot-btn { display: inline-block; padding: 8px 12px; margin: 5px; background: #fff; border: 1px solid #007bff; color: #007bff; border-radius: 3px; cursor: pointer; }
+        .slot-btn.selected { background: #007bff; color: #fff; }
+        .btn-book { padding: 10px 20px; background: #28a745; color: #fff; border: none; cursor: pointer; border-radius: 3px; font-size: 16px; margin-top: 15px;}
     </style>
 </head>
 <body>
@@ -85,9 +91,133 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
                 <?php if (!empty($profile->phone)): ?><p><strong>Phone:</strong> <?= Security::escape($profile->phone) ?></p><?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
+
+        <?php if ($data['schedule']): ?>
+            <div class="booking-section">
+                <h3>Book an Appointment</h3>
+                <?php if (Session::get('user_id') && Session::get('user_role_id') == 3): ?>
+                    <form id="bookingForm">
+                        <input type="hidden" id="clinic_id" value="<?= $profile->id ?>">
+                        <input type="hidden" id="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+
+                        <label for="date_picker">Select Date:</label><br>
+                        <input type="date" id="date_picker" min="<?= date('Y-m-d') ?>" style="padding: 8px; margin: 10px 0;"><br>
+
+                        <div id="slots_container" style="margin-top: 15px;">
+                            <!-- Slots will be populated here via AJAX -->
+                            <p style="color: #666;">Select a date to view available time slots.</p>
+                        </div>
+
+                        <input type="hidden" id="selected_time" value="">
+
+                        <div id="booking_message" style="margin-top: 10px; color: red;"></div>
+                        <button type="button" id="submit_booking" class="btn-book" style="display: none;">Confirm Appointment</button>
+                    </form>
+                <?php else: ?>
+                    <p>Please <a href="<?= URL_ROOT ?>/auth/login">login as a Patient</a> to book an appointment.</p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
     <?= $footerHtml ?>
+
+    <?php if ($data['schedule'] && Session::get('user_id') && Session::get('user_role_id') == 3): ?>
+    <script>
+        const datePicker = document.getElementById('date_picker');
+        const slotsContainer = document.getElementById('slots_container');
+        const selectedTimeInput = document.getElementById('selected_time');
+        const submitBooking = document.getElementById('submit_booking');
+        const bookingMessage = document.getElementById('booking_message');
+        const clinicId = document.getElementById('clinic_id').value;
+
+        datePicker.addEventListener('change', function() {
+            const date = this.value;
+            if (!date) return;
+
+            slotsContainer.innerHTML = '<p>Loading slots...</p>';
+            selectedTimeInput.value = '';
+            submitBooking.style.display = 'none';
+            bookingMessage.innerHTML = '';
+
+            let formData = new FormData();
+            formData.append('date', date);
+
+            fetch('<?= URL_ROOT ?>/clinic/getAvailableSlots/' + clinicId, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    slotsContainer.innerHTML = '<p style="color:red;">' + data.error + '</p>';
+                } else if (data.slots && data.slots.length > 0) {
+                    slotsContainer.innerHTML = '<p>Available slots for ' + date + ':</p>';
+                    data.slots.forEach(slot => {
+                        let btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'slot-btn';
+                        btn.textContent = slot;
+                        btn.onclick = function() {
+                            // deselect all
+                            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+                            this.classList.add('selected');
+                            selectedTimeInput.value = slot;
+                            submitBooking.style.display = 'inline-block';
+                        };
+                        slotsContainer.appendChild(btn);
+                    });
+                } else {
+                    slotsContainer.innerHTML = '<p>No available slots on this date.</p>';
+                }
+            })
+            .catch(err => {
+                slotsContainer.innerHTML = '<p style="color:red;">Error fetching slots.</p>';
+            });
+        });
+
+        submitBooking.addEventListener('click', function() {
+            const date = datePicker.value;
+            const time = selectedTimeInput.value;
+            const csrf = document.getElementById('csrf_token').value;
+
+            if (!date || !time) {
+                bookingMessage.innerHTML = 'Please select a date and time.';
+                return;
+            }
+
+            submitBooking.disabled = true;
+            submitBooking.textContent = 'Booking...';
+
+            let formData = new FormData();
+            formData.append('clinic_id', clinicId);
+            formData.append('appointment_date', date);
+            formData.append('appointment_time', time);
+            formData.append('csrf_token', csrf);
+
+            fetch('<?= URL_ROOT ?>/clinic/bookAppointment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    slotsContainer.innerHTML = '<div style="color: green; font-weight: bold; padding: 10px; background: #d4edda; border-radius: 4px;">Appointment requested successfully! You can track its status in your dashboard.</div>';
+                    submitBooking.style.display = 'none';
+                } else {
+                    bookingMessage.innerHTML = data.error || 'An error occurred.';
+                    submitBooking.disabled = false;
+                    submitBooking.textContent = 'Confirm Appointment';
+                }
+            })
+            .catch(err => {
+                bookingMessage.innerHTML = 'A network error occurred.';
+                submitBooking.disabled = false;
+                submitBooking.textContent = 'Confirm Appointment';
+            });
+        });
+    </script>
+    <?php endif; ?>
 
 </body>
 </html>
