@@ -172,6 +172,34 @@ CREATE TABLE IF NOT EXISTS medicines_inventory (
     FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Reviews by Patients for Clinics
+CREATE TABLE IF NOT EXISTS clinic_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT NOT NULL UNIQUE,
+    patient_id INT NOT NULL,
+    clinic_id INT NOT NULL,
+    rating INT NOT NULL CHECK(rating >= 1 AND rating <= 5),
+    review_text TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Reviews by Clinics for Patients
+CREATE TABLE IF NOT EXISTS patient_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT NOT NULL UNIQUE,
+    clinic_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    rating INT NOT NULL CHECK(rating >= 1 AND rating <= 5),
+    review_text TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Prescriptions
 CREATE TABLE IF NOT EXISTS prescriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,

@@ -98,6 +98,34 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
             <?php endif; ?>
         <?php endif; ?>
 
+        <hr style="margin: 40px 0;">
+
+        <!-- Reviews Section -->
+        <div class="reviews-section" style="margin-bottom: 40px;">
+            <h3>Patient Reviews</h3>
+            <?php if ($data['avgRating']->total_reviews > 0): ?>
+                <div style="font-size: 1.2em; font-weight: bold; color: #f39c12; margin-bottom: 20px;">
+                    ⭐ <?= number_format($data['avgRating']->avg_rating, 1) ?> / 5 (<?= $data['avgRating']->total_reviews ?> Reviews)
+                </div>
+                <?php foreach ($data['reviews'] as $review): ?>
+                    <div style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; border-radius: 5px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong><?= Security::escape($review->patient_name) ?></strong>
+                            <span style="color: #f39c12;">
+                                <?= str_repeat('★', $review->rating) ?><?= str_repeat('☆', 5 - $review->rating) ?>
+                            </span>
+                        </div>
+                        <?php if (!empty($review->review_text)): ?>
+                            <p style="margin-top: 10px; color: #555;"><?= nl2br(Security::escape($review->review_text)) ?></p>
+                        <?php endif; ?>
+                        <small style="color: #999;"><?= date('M d, Y', strtotime($review->created_at)) ?></small>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No reviews yet.</p>
+            <?php endif; ?>
+        </div>
+
         <?php if ($data['schedule']): ?>
             <div class="booking-section">
                 <h3>Book an Appointment</h3>

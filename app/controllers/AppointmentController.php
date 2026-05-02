@@ -87,8 +87,14 @@ class AppointmentController extends Controller {
             die("Unauthorized access.");
         }
 
+        $reviewModel = $this->model('ReviewModel');
+        $patientReview = $reviewModel->getPatientReviewByAppointment($id);
+        $clinicReview = $reviewModel->getClinicReviewByAppointment($id);
+
         $data = [
-            'appointment' => $appt
+            'appointment' => $appt,
+            'patientReview' => $patientReview,
+            'clinicReview' => $clinicReview
         ];
 
         $this->view('appointments/view', $data);

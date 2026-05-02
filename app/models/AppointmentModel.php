@@ -39,7 +39,17 @@ class AppointmentModel {
     }
 
     public function getClinicAppointments($clinic_id) {
-        $this->db->query('SELECT a.*, u.name as patient_name FROM appointments a JOIN patient_profiles pp ON a.patient_id = pp.user_id JOIN users u ON pp.user_id = u.id WHERE a.clinic_id = :clinic_id ORDER BY a.appointment_date DESC, a.appointment_time DESC');
+        // Fetch appointments with patient name and their average rating
+        $this->db->query('
+            SELECT a.*, u.name as patient_name,
+            (SELECT AVG(rating) FROM patient_reviews WHERE patient_id = a.patient_id) as patient_rating,
+            (SELECT COUNT(id) FROM patient_reviews WHERE patient_id = a.patient_id) as patient_review_count
+            FROM appointments a
+            JOIN patient_profiles pp ON a.patient_id = pp.user_id
+            JOIN users u ON pp.user_id = u.id
+            WHERE a.clinic_id = :clinic_id
+            ORDER BY a.appointment_date DESC, a.appointment_time DESC
+        ');
         $this->db->bind(':clinic_id', $clinic_id);
         return $this->db->resultSet();
     }

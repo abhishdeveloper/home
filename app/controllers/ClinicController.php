@@ -53,12 +53,18 @@ class ClinicController extends Controller {
         $scheduleModel = $this->model('ScheduleModel');
         $schedule = $scheduleModel->getScheduleByClinicId($profile->id);
 
+        $reviewModel = $this->model('ReviewModel');
+        $clinicReviews = $reviewModel->getReviewsForClinic($profile->id);
+        $avgRating = $reviewModel->getClinicAverageRating($profile->id);
+
         $data = [
             'profile' => $profile,
             'theme' => $theme,
             'pages' => $pages, // to build nav
             'current_page' => $currentPage,
-            'schedule' => $schedule
+            'schedule' => $schedule,
+            'reviews' => $clinicReviews,
+            'avgRating' => $avgRating
         ];
 
         $this->view('clinic/public_view', $data);

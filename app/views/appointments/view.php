@@ -140,6 +140,67 @@
                     <a href="<?= URL_ROOT ?>/prescription/view/<?= $data['appointment']->id ?>" class="btn">View / Download Prescription</a>
                 <?php endif; ?>
             </div>
+
+            <!-- Review Section -->
+            <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px;">
+                <?php if (Session::get('user_role_id') == 3): ?>
+                    <!-- Patient reviewing Clinic -->
+                    <?php if ($data['clinicReview']): ?>
+                        <h4>Your Review of the Clinic</h4>
+                        <p><strong>Rating:</strong> <?= $data['clinicReview']->rating ?> / 5 Stars</p>
+                        <p><?= nl2br(Security::escape($data['clinicReview']->review_text)) ?></p>
+                    <?php else: ?>
+                        <h4>Rate Your Experience with <?= Security::escape($data['appointment']->clinic_name) ?></h4>
+                        <form action="<?= URL_ROOT ?>/review/submit" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                            <input type="hidden" name="appointment_id" value="<?= $data['appointment']->id ?>">
+                            <div style="margin-bottom: 10px;">
+                                <label>Rating:</label>
+                                <select name="rating" required>
+                                    <option value="5">5 - Excellent</option>
+                                    <option value="4">4 - Very Good</option>
+                                    <option value="3">3 - Good</option>
+                                    <option value="2">2 - Fair</option>
+                                    <option value="1">1 - Poor</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <textarea name="review_text" rows="3" style="width: 100%;" placeholder="Leave a review... (Optional)"></textarea>
+                            </div>
+                            <button type="submit" class="btn">Submit Review</button>
+                        </form>
+                    <?php endif; ?>
+                <?php elseif (Session::get('user_role_id') == 2): ?>
+                    <!-- Clinic reviewing Patient -->
+                    <?php if ($data['patientReview']): ?>
+                        <h4>Your Rating of the Patient</h4>
+                        <p><strong>Rating:</strong> <?= $data['patientReview']->rating ?> / 5 Stars</p>
+                        <p><?= nl2br(Security::escape($data['patientReview']->review_text)) ?></p>
+                    <?php else: ?>
+                        <h4>Rate <?= Security::escape($data['appointment']->patient_name) ?></h4>
+                        <p style="font-size: 0.9em; color: #666;">Private rating for internal clinic records/reputation tracking.</p>
+                        <form action="<?= URL_ROOT ?>/review/submit" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+                            <input type="hidden" name="appointment_id" value="<?= $data['appointment']->id ?>">
+                            <div style="margin-bottom: 10px;">
+                                <label>Rating:</label>
+                                <select name="rating" required>
+                                    <option value="5">5 - Excellent Patient</option>
+                                    <option value="4">4 - Good</option>
+                                    <option value="3">3 - Average</option>
+                                    <option value="2">2 - Difficult</option>
+                                    <option value="1">1 - No Show / Very Difficult</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <textarea name="review_text" rows="3" style="width: 100%;" placeholder="Internal notes... (Optional)"></textarea>
+                            </div>
+                            <button type="submit" class="btn">Save Rating</button>
+                        </form>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
         <?php else: ?>
             <p>Chat and Video capabilities will be available once the appointment is approved by the clinic.</p>
         <?php endif; ?>

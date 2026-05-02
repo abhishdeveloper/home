@@ -42,7 +42,14 @@
                     <?php foreach ($data['appointments'] as $appt): ?>
                         <tr>
                             <td><?= date('M d, Y', strtotime($appt->appointment_date)) ?> at <?= date('h:i A', strtotime($appt->appointment_time)) ?></td>
-                            <td><?= Security::escape($appt->patient_name) ?></td>
+                            <td>
+                                <?= Security::escape($appt->patient_name) ?>
+                                <?php if ($appt->patient_review_count > 0): ?>
+                                    <br><small style="color: #f39c12;">⭐ <?= number_format($appt->patient_rating, 1) ?> (<?= $appt->patient_review_count ?>)</small>
+                                <?php else: ?>
+                                    <br><small style="color: #999;">No ratings</small>
+                                <?php endif; ?>
+                            </td>
                             <td><span class="status <?= $appt->status ?>"><?= ucfirst($appt->status) ?></span></td>
                             <td>
                                 <a href="<?= URL_ROOT ?>/appointment/view/<?= $appt->id ?>" class="btn">View & Chat</a>
