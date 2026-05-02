@@ -27,9 +27,12 @@ class AppointmentModel {
         $this->db->bind(':clinic_id', $data['clinic_id']);
         $this->db->bind(':appointment_date', $data['appointment_date']);
         $this->db->bind(':appointment_time', $data['appointment_time']);
-        $this->db->bind(':status', 'pending');
+        $this->db->bind(':status', 'pending_payment');
 
-        return $this->db->execute();
+        if ($this->db->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return false;
     }
 
     public function getPatientAppointments($patient_user_id) {

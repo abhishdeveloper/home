@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS clinic_profiles (
     whatsapp VARCHAR(50) NULL,
     facebook VARCHAR(255) NULL,
     instagram VARCHAR(255) NULL,
+    consultation_fee DECIMAL(10,2) DEFAULT 0.00,
     is_published TINYINT(1) DEFAULT 0,
     has_paid_branding TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -149,7 +150,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     clinic_id INT NOT NULL,
     appointment_date DATE NOT NULL,
     appointment_time TIME NOT NULL,
-    status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
+    status ENUM('pending_payment', 'pending', 'approved', 'rejected', 'completed') DEFAULT 'pending_payment',
     private_notes TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -229,11 +230,17 @@ CREATE TABLE IF NOT EXISTS prescriptions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Billing Transactions
-CREATE TABLE IF NOT EXISTS billing_transactions (
+-- Payments Table (Replaces simple billing_transactions)
+CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    clinic_id INT NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'completed',
+    user_id INT NOT NULL,
+    payment_type ENUM('appointment', 'profile_upgrade') NOT NULL,
+    reference_id INT NULL, -- ID of the appointment or clinic profile
+    base_amount DECIMAL(10, 2) NOT NULL,
+    tax_amount DECIMAL(10, 2) NOT NULL,
+    platform_fee DECIMAL(10, 2) NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'success', 'failed') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (clinic_id) REFERENCES clinic_profiles(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

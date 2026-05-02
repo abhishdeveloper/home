@@ -71,9 +71,16 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="address">Address</label>
-                <textarea name="address" id="address" rows="3"><?= Security::escape($data['address'] ?? '') ?></textarea>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="address">Address</label>
+                    <textarea name="address" id="address" rows="3"><?= Security::escape($data['address'] ?? '') ?></textarea>
+                </div>
+                <div class="col form-group">
+                    <label for="consultation_fee">Consultation Fee (₹)</label>
+                    <input type="number" name="consultation_fee" id="consultation_fee" value="<?= Security::escape($data['consultation_fee'] ?? '0') ?>" min="0" step="0.01">
+                    <small style="color: #666; display: block; margin-top: 5px;">This fee is charged to patients when booking an appointment.</small>
+                </div>
             </div>
 
             <div class="row">

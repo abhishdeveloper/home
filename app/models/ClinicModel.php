@@ -39,7 +39,7 @@ class ClinicModel {
     }
 
     public function createProfile($data) {
-        $this->db->query('INSERT INTO clinic_profiles (user_id, slug, clinic_name, specialty_id, theme_id, primary_color, logo_url, address, phone, whatsapp, facebook, instagram) VALUES (:user_id, :slug, :clinic_name, :specialty_id, :theme_id, :primary_color, :logo_url, :address, :phone, :whatsapp, :facebook, :instagram)');
+        $this->db->query('INSERT INTO clinic_profiles (user_id, slug, clinic_name, specialty_id, theme_id, primary_color, logo_url, address, phone, whatsapp, facebook, instagram, consultation_fee) VALUES (:user_id, :slug, :clinic_name, :specialty_id, :theme_id, :primary_color, :logo_url, :address, :phone, :whatsapp, :facebook, :instagram, :consultation_fee)');
         $this->db->bind(':user_id', $data['user_id']);
         $this->db->bind(':slug', $data['slug']);
         $this->db->bind(':clinic_name', $data['clinic_name']);
@@ -52,12 +52,13 @@ class ClinicModel {
         $this->db->bind(':whatsapp', $data['whatsapp']);
         $this->db->bind(':facebook', $data['facebook']);
         $this->db->bind(':instagram', $data['instagram']);
+        $this->db->bind(':consultation_fee', $data['consultation_fee'] ?? 0.00);
 
         return $this->db->execute();
     }
 
     public function updateProfile($data) {
-        $query = 'UPDATE clinic_profiles SET slug = :slug, clinic_name = :clinic_name, specialty_id = :specialty_id, theme_id = :theme_id, primary_color = :primary_color, address = :address, phone = :phone, whatsapp = :whatsapp, facebook = :facebook, instagram = :instagram';
+        $query = 'UPDATE clinic_profiles SET slug = :slug, clinic_name = :clinic_name, specialty_id = :specialty_id, theme_id = :theme_id, primary_color = :primary_color, address = :address, phone = :phone, whatsapp = :whatsapp, facebook = :facebook, instagram = :instagram, consultation_fee = :consultation_fee';
         if (isset($data['logo_url'])) {
             $query .= ', logo_url = :logo_url';
         }
@@ -77,6 +78,7 @@ class ClinicModel {
         $this->db->bind(':whatsapp', $data['whatsapp']);
         $this->db->bind(':facebook', $data['facebook']);
         $this->db->bind(':instagram', $data['instagram']);
+        $this->db->bind(':consultation_fee', $data['consultation_fee'] ?? 0.00);
         $this->db->bind(':user_id', $data['user_id']);
 
         return $this->db->execute();

@@ -126,6 +126,7 @@ class OnboardingController extends Controller {
             'whatsapp' => $existingProfile ? $existingProfile->whatsapp : '',
             'facebook' => $existingProfile ? $existingProfile->facebook : '',
             'instagram' => $existingProfile ? $existingProfile->instagram : '',
+            'consultation_fee' => $existingProfile ? $existingProfile->consultation_fee : '0.00',
             'specialties' => $specialtyModel->getAll(),
             'themes' => $themeModel->getAll(),
             'error' => '',
@@ -148,6 +149,7 @@ class OnboardingController extends Controller {
             $data['whatsapp'] = trim(htmlspecialchars($_POST['whatsapp'] ?? ''));
             $data['facebook'] = trim(htmlspecialchars($_POST['facebook'] ?? ''));
             $data['instagram'] = trim(htmlspecialchars($_POST['instagram'] ?? ''));
+            $data['consultation_fee'] = isset($_POST['consultation_fee']) ? (float)$_POST['consultation_fee'] : 0.00;
 
             // Handle Logo Upload
             $logo_url = null;
@@ -200,7 +202,8 @@ class OnboardingController extends Controller {
                     'phone' => $data['phone'],
                     'whatsapp' => $data['whatsapp'],
                     'facebook' => $data['facebook'],
-                    'instagram' => $data['instagram']
+                    'instagram' => $data['instagram'],
+                    'consultation_fee' => $data['consultation_fee']
                 ];
 
                 if ($logo_url) {

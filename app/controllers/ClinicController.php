@@ -216,25 +216,14 @@ class ClinicController extends Controller {
                 'appointment_time' => $appointment_time
             ];
 
-            if ($appointmentModel->createAppointment($data)) {
-                // Email Clinic
-                $clinicModel = $this->model('ClinicModel');
-                // The $_POST['clinic_id'] is actually the clinic profile ID in our schema
-                $profileRow = $clinicModel->getProfileById((int)$_POST['clinic_id']);
+            $newApptId = $appointmentModel->createAppointment($data);
 
-                if ($profileRow) {
-                    $userModel = $this->model('UserModel');
-                    $clinicUser = $userModel->findUserById($profileRow->user_id);
-                    if ($clinicUser) {
-                        $subject = "New Appointment Request";
-                        $body = "<h2>New Appointment Request</h2><p>You have a new appointment request for {$data['appointment_date']} at {$data['appointment_time']}.</p><p>Please log in to your dashboard to approve or reject it.</p>";
-                        EmailHelper::sendEmail($clinicUser->email, $subject, $body);
-                    }
-                }
-
-                echo json_encode(['success' => true]);
+            if ($newApptId) {
+                // Return redirect URL to the dummy payment gateway instead of sending emails instantly
+                $redirectUrl = URL_ROOT . '/payment/checkout?type=appointment&ref_id=' . $newApptId;
+                echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
             } else {
-                echo json_encode(['success' => false, 'error' => 'Failed to book appointment.']);
+                echo json_encode(['success' => false, 'error' => 'Failed to initiate appointment booking.']);
             }
             exit;
         }

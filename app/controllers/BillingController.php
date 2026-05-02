@@ -37,26 +37,12 @@ class BillingController extends Controller {
             $profile = $clinicModel->getProfileByUserId(Session::get('user_id'));
 
             if ($profile && !$profile->has_paid_branding) {
-                // Simulate gateway success
-                $amount = 999.00;
-
-                // Record the transaction
-                $clinicModel->recordTransaction($profile->id, $amount);
-
-                // Upgrade the account
-                $clinicModel->upgradeBranding($profile->id);
-
-                // Send success email
-                $userModel = $this->model('UserModel');
-                $user = $userModel->findUserById(Session::get('user_id'));
-                if ($user) {
-                    $subject = "Upgrade Successful - Branding Removed";
-                    $body = "<h2>Thank you for upgrading!</h2><p>Your payment of ₹{$amount} was successful.</p><p>The universal platform branding has now been removed from your public clinic profile.</p>";
-                    EmailHelper::sendEmail($user->email, $subject, $body);
-                }
+                // Redirect to universal payment gateway
+                header('Location: ' . URL_ROOT . '/payment/checkout?type=profile_upgrade&ref_id=' . $profile->id);
+                exit;
             }
 
-            header('Location: ' . URL_ROOT . '/billing?success=1');
+            header('Location: ' . URL_ROOT . '/billing');
             exit;
         }
     }

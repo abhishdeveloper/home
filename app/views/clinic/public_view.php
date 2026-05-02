@@ -276,9 +276,8 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    slotsContainer.innerHTML = '<div style="color: green; font-weight: bold; padding: 10px; background: #d4edda; border-radius: 4px;">Appointment requested successfully! You can track its status in your dashboard.</div>';
-                    submitBooking.style.display = 'none';
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
                 } else {
                     bookingMessage.innerHTML = data.error || 'An error occurred.';
                     submitBooking.disabled = false;
