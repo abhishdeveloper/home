@@ -97,4 +97,31 @@ class UserModel {
 
         return $this->db->execute();
     }
+
+    // Update basic user info
+    public function updateUserInfo($id, $name, $avatar_url = null) {
+        $query = 'UPDATE users SET name = :name';
+        if ($avatar_url !== null) {
+            $query .= ', avatar_url = :avatar_url';
+        }
+        $query .= ' WHERE id = :id';
+
+        $this->db->query($query);
+        $this->db->bind(':name', $name);
+        if ($avatar_url !== null) {
+            $this->db->bind(':avatar_url', $avatar_url);
+        }
+        $this->db->bind(':id', $id);
+
+        return $this->db->execute();
+    }
+
+    // Update password
+    public function updatePassword($id, $hashed_password) {
+        $this->db->query('UPDATE users SET password = :password WHERE id = :id');
+        $this->db->bind(':password', $hashed_password);
+        $this->db->bind(':id', $id);
+
+        return $this->db->execute();
+    }
 }

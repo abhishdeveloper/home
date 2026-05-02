@@ -24,9 +24,21 @@ class ClinicDashboardController extends Controller {
         $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
         $pages = $this->clinicModel->getPages($profile->id);
 
+        $appointmentModel = $this->model('AppointmentModel');
+        $stats = $appointmentModel->getClinicDashboardStats($profile->id);
+
+        $reviewModel = $this->model('ReviewModel');
+        $rating = $reviewModel->getClinicAverageRating($profile->id);
+
+        $userModel = $this->model('UserModel');
+        $user = $userModel->findUserById(Session::get('user_id'));
+
         $data = [
+            'user' => $user,
             'profile' => $profile,
-            'pages' => $pages
+            'pages' => $pages,
+            'stats' => $stats,
+            'rating' => $rating
         ];
 
         $this->view('clinic/dashboard', $data);

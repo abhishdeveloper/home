@@ -14,22 +14,50 @@
         .btn-warning { background: #ffc107; color: #212529; }
         .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .table th, .table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+
+        .metric-cards { display: flex; gap: 15px; margin-bottom: 20px; }
+        .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
+        .metric-card h3 { margin: 0; font-size: 2em; color: #007bff; }
+        .metric-card p { margin: 5px 0 0 0; color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div>
-                <h2>Welcome, <?= Security::escape($data['profile']->clinic_name) ?></h2>
-                <p>Public URL: <a href="<?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?>" target="_blank"><?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?></a></p>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="<?= !empty($data['user']->avatar_url) ? URL_ROOT . Security::escape($data['user']->avatar_url) : 'https://via.placeholder.com/60' ?>" alt="Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
+                <div>
+                    <h2 style="margin: 0;">Welcome, <?= Security::escape($data['profile']->clinic_name) ?></h2>
+                    <p style="margin: 5px 0 0 0;">Public URL: <a href="<?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?>" target="_blank"><?= URL_ROOT ?>/clinic/view/<?= Security::escape($data['profile']->slug) ?></a></p>
+                </div>
             </div>
-            <nav>
+            <nav style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; max-width: 500px;">
                 <a href="<?= URL_ROOT ?>/appointment" class="btn" style="background:#17a2b8;">Appointments</a>
                 <a href="<?= URL_ROOT ?>/clinicDashboard/schedule" class="btn btn-success">Manage Schedule</a>
                 <a href="<?= URL_ROOT ?>/billing" class="btn" style="background:#6f42c1;">Billing & Upgrade</a>
-                <a href="<?= URL_ROOT ?>/onboarding/clinic" class="btn btn-warning">Edit Profile Settings</a>
-                <a href="<?= URL_ROOT ?>/auth/logout" class="btn">Logout</a>
+                <a href="<?= URL_ROOT ?>/onboarding/clinic" class="btn btn-warning">Clinic Settings</a>
+                <a href="<?= URL_ROOT ?>/profile" class="btn" style="background:#6c757d;">Account Settings</a>
+                <a href="<?= URL_ROOT ?>/auth/logout" class="btn" style="background:#dc3545;">Logout</a>
             </nav>
+        </div>
+
+        <div class="metric-cards">
+            <div class="metric-card">
+                <h3><?= $data['stats']->total_appointments ?? 0 ?></h3>
+                <p>Total Appointments</p>
+            </div>
+            <div class="metric-card">
+                <h3 style="color: #ffc107;"><?= $data['stats']->pending_requests ?? 0 ?></h3>
+                <p>Pending Requests</p>
+            </div>
+            <div class="metric-card">
+                <h3 style="color: #28a745;"><?= $data['stats']->upcoming_appointments ?? 0 ?></h3>
+                <p>Upcoming Appts</p>
+            </div>
+            <div class="metric-card">
+                <h3 style="color: #f39c12;">⭐ <?= number_format($data['rating']->avg_rating ?? 0, 1) ?></h3>
+                <p><?= $data['rating']->total_reviews ?? 0 ?> Reviews</p>
+            </div>
         </div>
 
         <div class="card">

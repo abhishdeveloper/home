@@ -67,6 +67,46 @@ class AppointmentModel {
         return $this->db->execute();
     }
 
+    // Dashboard Stats
+    public function getClinicDashboardStats($clinic_id) {
+        $this->db->query('
+            SELECT
+                COUNT(*) as total_appointments,
+                SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending_requests,
+                SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as upcoming_appointments
+            FROM appointments
+            WHERE clinic_id = :clinic_id
+        ');
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->single();
+    }
+
+    public function getPatientDashboardStats($patient_user_id) {
+        $this->db->query('
+            SELECT
+                COUNT(*) as total_appointments,
+                SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as upcoming_appointments
+            FROM appointments
+            WHERE patient_id = :patient_id
+        ');
+        $this->db->bind(':patient_id', $patient_user_id);
+        return $this->db->single();
+    }
+
+    public function getUpcomingPatientAppointments($patient_user_id, $limit = 5) {
+        $this->db->query('
+            SELECT a.*, cp.clinic_name
+            FROM appointments a
+            JOIN clinic_profiles cp ON a.clinic_id = cp.id
+            WHERE a.patient_id = :patient_id AND a.status = "approved" AND a.appointment_date >= CURDATE()
+            ORDER BY a.appointment_date ASC, a.appointment_time ASC
+            LIMIT :limit
+        ');
+        $this->db->bind(':patient_id', $patient_user_id);
+        $this->db->bind(':limit', $limit);
+        return $this->db->resultSet();
+    }
+
     // Chat Messages
     public function getMessages($appointment_id) {
         $this->db->query('SELECT am.*, u.name as sender_name FROM appointment_messages am JOIN users u ON am.sender_id = u.id WHERE am.appointment_id = :appointment_id ORDER BY am.created_at ASC');

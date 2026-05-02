@@ -189,7 +189,15 @@ class AuthController extends Controller {
         Session::set('user_email', $user->email);
         Session::set('user_name', $user->name);
         Session::set('user_role_id', $user->role_id);
-        header('Location: ' . URL_ROOT . '/onboarding');
+
+        // Dynamic redirect based on role
+        if ($user->role_id == 3) {
+            header('Location: ' . URL_ROOT . '/patientDashboard');
+        } elseif ($user->role_id == 2) {
+            header('Location: ' . URL_ROOT . '/clinicDashboard');
+        } else {
+            header('Location: ' . URL_ROOT . '/onboarding');
+        }
         exit;
     }
 

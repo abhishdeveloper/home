@@ -20,7 +20,7 @@ class OnboardingController extends Controller {
                 header('Location: ' . URL_ROOT . '/onboarding/patient');
                 exit;
             } else {
-                header('Location: ' . URL_ROOT . '/directory');
+                header('Location: ' . URL_ROOT . '/patientDashboard');
                 exit;
             }
         } elseif ($role_id == 2) {
@@ -77,14 +77,14 @@ class OnboardingController extends Controller {
 
             if ($existingProfile) {
                 if ($patientModel->updateProfile($profileData)) {
-                    header('Location: ' . URL_ROOT . '/directory');
+                    header('Location: ' . URL_ROOT . '/patientDashboard');
                     exit;
                 } else {
                     $data['error'] = 'Something went wrong updating profile.';
                 }
             } else {
                 if ($patientModel->createProfile($profileData)) {
-                    header('Location: ' . URL_ROOT . '/directory');
+                    header('Location: ' . URL_ROOT . '/patientDashboard');
                     exit;
                 } else {
                     $data['error'] = 'Something went wrong creating profile.';
