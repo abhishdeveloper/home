@@ -155,15 +155,45 @@ class ClinicModel {
         return $this->db->execute();
     }
 
-    public function searchClinics($specialty_id = null) {
-        $query = 'SELECT cp.*, s.name as specialty_name FROM clinic_profiles cp LEFT JOIN specialties s ON cp.specialty_id = s.id WHERE cp.is_published = 1';
+    public function searchClinics($specialty_id = null, $search_query = null) {
+        $query = 'SELECT cp.*, s.name as specialty_name,
+                  (SELECT AVG(rating) FROM clinic_reviews WHERE clinic_id = cp.id) as avg_rating
+                  FROM clinic_profiles cp
+                  LEFT JOIN specialties s ON cp.specialty_id = s.id
+                  WHERE cp.is_published = 1';
+
         if ($specialty_id) {
             $query .= ' AND cp.specialty_id = :specialty_id';
         }
+        if ($search_query) {
+            $query .= ' AND (cp.clinic_name LIKE :search OR cp.address LIKE :search)';
+        }
+
         $this->db->query($query);
+
         if ($specialty_id) {
             $this->db->bind(':specialty_id', $specialty_id);
         }
+        if ($search_query) {
+            $this->db->bind(':search', '%' . $search_query . '%');
+        }
+
+        return $this->db->resultSet();
+    }
+
+    public function getFeaturedClinics($limit = 3) {
+        // Fetch published clinics ordered by their average rating
+        $this->db->query('
+            SELECT cp.*, s.name as specialty_name,
+            (SELECT AVG(rating) FROM clinic_reviews WHERE clinic_id = cp.id) as avg_rating,
+            (SELECT COUNT(id) FROM clinic_reviews WHERE clinic_id = cp.id) as total_reviews
+            FROM clinic_profiles cp
+            LEFT JOIN specialties s ON cp.specialty_id = s.id
+            WHERE cp.is_published = 1
+            ORDER BY avg_rating DESC, total_reviews DESC
+            LIMIT :limit
+        ');
+        $this->db->bind(':limit', $limit);
         return $this->db->resultSet();
     }
 }
