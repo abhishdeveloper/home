@@ -154,11 +154,7 @@ class OnboardingController extends Controller {
             // Handle Logo Upload
             $logo_url = null;
             if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-                // APP_ROOT is the absolute path to the project root (e.g. /workspace/app)
-                // So the public dir is APP_ROOT . '/public/' or similar depending on exactly how it's defined.
-                // In config.php: define('APP_ROOT', dirname(dirname(__FILE__)));
-                // Which means APP_ROOT is /workspace (the repo root)
-                $uploadDir = APP_ROOT . '/public/images/logos/';
+                $uploadDir = APP_ROOT . '/images/logos/';
                 $fileTmp = $_FILES['logo']['tmp_name'];
                 $fileName = basename($_FILES['logo']['name']);
                 $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));

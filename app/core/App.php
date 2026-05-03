@@ -10,7 +10,7 @@ class App {
         $url = $this->getUrl();
 
         // Look in controllers for first value
-        if(isset($url[0]) && file_exists('../app/controllers/' . ucwords($url[0]) . 'Controller.php')) {
+        if(isset($url[0]) && file_exists('./app/controllers/' . ucwords($url[0]) . 'Controller.php')) {
             $this->currentController = ucwords($url[0]) . 'Controller';
             unset($url[0]);
         } else {
@@ -18,7 +18,7 @@ class App {
         }
 
         // Require the controller
-        require_once '../app/controllers/' . $this->currentController . '.php';
+        require_once './app/controllers/' . $this->currentController . '.php';
 
         // Instantiate controller class
         $this->currentController = new $this->currentController;

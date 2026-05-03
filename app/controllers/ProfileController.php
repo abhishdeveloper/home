@@ -36,7 +36,7 @@ class ProfileController extends Controller {
             } else {
                 // Handle Avatar Upload
                 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = APP_ROOT . '/public/images/avatars/';
+                    $uploadDir = APP_ROOT . '/images/avatars/';
                     $fileTmp = $_FILES['avatar']['tmp_name'];
                     $fileName = basename($_FILES['avatar']['name']);
                     $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));

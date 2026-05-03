@@ -149,7 +149,7 @@ class AppointmentController extends Controller {
                 $data['attachment_error'] = 'Cannot upload files to completed or rejected appointments.';
             } else {
                 if ($_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = APP_ROOT . '/public/attachments/';
+                    $uploadDir = APP_ROOT . '/attachments/';
                     $fileTmp = $_FILES['attachment']['tmp_name'];
                     $originalName = basename($_FILES['attachment']['name']);
                     $fileExt = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
