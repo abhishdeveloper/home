@@ -11,10 +11,11 @@
         .user-info { display: flex; align-items: center; gap: 15px; }
         .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
         .nav a { margin-left: 10px; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
-        .card-row { display: flex; gap: 20px; margin-bottom: 20px; }
-        .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
-        .metric-card h3 { margin: 0; font-size: 2em; color: #007bff; }
-        .metric-card p { margin: 5px 0 0 0; color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
+        .card-row { display: flex; gap: 20px; margin-bottom: 30px; }
+        .metric-card { flex: 1; background: var(--white); padding: 25px; border-radius: 12px; box-shadow: var(--card-shadow); text-align: center; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02);}
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .metric-card h3 { margin: 0; font-size: 2.2em; color: var(--primary); font-weight: 700; }
+        .metric-card p { margin: 8px 0 0 0; color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;}
         .card { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
         .appt-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; align-items: center; flex-wrap: wrap; gap: 10px;}
         .appt-item:last-child { border-bottom: none; }

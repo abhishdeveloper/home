@@ -1,4 +1,4 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <style>
     .payment-container { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 20px;}
@@ -90,4 +90,4 @@
     </div>
 </div>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

@@ -1,9 +1,22 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <style>
-    .hero { text-align: center; padding: 60px 20px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px;}
-    .hero h1 { font-size: 2.5em; color: #007bff; margin-bottom: 10px; }
-    .hero p { font-size: 1.2em; color: #555; max-width: 600px; margin: 0 auto 30px auto; }
+    .hero {
+        text-align: center; padding: 100px 20px; border-radius: 24px; margin-bottom: 50px;
+        background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        position: relative; overflow: hidden;
+    }
+    .hero::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%);
+        animation: pulse 15s linear infinite; pointer-events: none;
+    }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 0.5; } }
+
+    .hero h1 { font-size: 3.5em; color: var(--text-dark); margin-bottom: 15px; font-weight: 800; letter-spacing: -1px; position: relative;}
+    .hero h1 span { background: linear-gradient(135deg, var(--primary), #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 1.25em; color: var(--text-muted); max-width: 650px; margin: 0 auto 40px auto; position: relative;}
     .search-box { display: flex; max-width: 600px; margin: 0 auto; gap: 10px; }
     .search-box input, .search-box select { padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
     .search-box input { flex: 2; }
@@ -14,8 +27,8 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 </style>
 
-<div class="hero">
-    <h1>Find the Right Doctor. Book Instantly.</h1>
+<div class="hero animate-fade-up">
+    <h1>Find the Right <span>Doctor</span>.<br>Book Instantly.</h1>
     <p><?= Security::escape($data['description']) ?></p>
 
     <form action="<?= URL_ROOT ?>/directory" method="GET" class="search-box">
@@ -53,10 +66,10 @@
     <?php endif; ?>
 </div>
 
-<div class="card" style="margin-top: 40px; text-align: center; background: #007bff; color: #fff;">
-    <h2 style="color: #fff;">Are you a Doctor or Clinic?</h2>
-    <p style="font-size: 1.1em; margin-bottom: 20px;">Join our platform to manage your appointments, offer video consultations, and build a beautiful online presence in minutes.</p>
-    <a href="<?= URL_ROOT ?>/auth/register" class="btn-primary" style="background: #fff; color: #007bff !important;">Create Clinic Profile</a>
+<div class="card hover-lift" style="margin-top: 60px; text-align: center; background: linear-gradient(135deg, var(--primary), #8B5CF6); color: #fff; padding: 50px 20px; border-radius: 24px; border: none;">
+    <h2 style="color: #fff; font-size: 2.5em; margin-bottom: 10px; font-weight: 800; letter-spacing: -0.5px;">Are you a Doctor or Clinic?</h2>
+    <p style="font-size: 1.2em; margin-bottom: 30px; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto;">Join our platform to manage your appointments, offer video consultations, and build a beautiful online presence in minutes.</p>
+    <a href="<?= URL_ROOT ?>/auth/register" class="btn-primary" style="background: #fff; color: var(--primary) !important; font-size: 1.1em; padding: 15px 30px;">Create Clinic Profile &rarr;</a>
 </div>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

@@ -10,24 +10,31 @@ foreach ($pages as $p) {
     if ($p->status == 'published') {
         // If it's home, link to base slug, else link to base/page_slug
         $link = URL_ROOT . '/clinic/view/' . Security::escape($profile->slug) . ($p->is_home ? '' : '/' . Security::escape($p->slug));
-        $navHtml .= '<a href="' . $link . '" style="margin: 0 10px;">' . Security::escape($p->title) . '</a>';
+        $activeStyle = ($currentPage && $currentPage->id == $p->id) ? 'font-weight:700; text-decoration:underline;' : '';
+        $navHtml .= '<a href="' . $link . '" style="color: inherit; text-decoration: none; ' . $activeStyle . '">' . Security::escape($p->title) . '</a>';
     }
 }
 
 // Build Social Links HTML
 $socialHtml = '';
-if (!empty($profile->facebook)) $socialHtml .= '<a href="' . Security::escape($profile->facebook) . '" target="_blank" style="margin: 0 5px;">Facebook</a>';
-if (!empty($profile->instagram)) $socialHtml .= '<a href="' . Security::escape($profile->instagram) . '" target="_blank" style="margin: 0 5px;">Instagram</a>';
-if (!empty($profile->whatsapp)) $socialHtml .= '<a href="https://wa.me/' . Security::escape($profile->whatsapp) . '" target="_blank" style="margin: 0 5px;">WhatsApp</a>';
+if (!empty($profile->facebook)) $socialHtml .= '<a href="' . Security::escape($profile->facebook) . '" target="_blank" style="color: inherit; text-decoration:none;">Facebook</a>';
+if (!empty($profile->instagram)) $socialHtml .= '<a href="' . Security::escape($profile->instagram) . '" target="_blank" style="color: inherit; text-decoration:none;">Instagram</a>';
+if (!empty($profile->whatsapp)) $socialHtml .= '<a href="https://wa.me/' . Security::escape($profile->whatsapp) . '" target="_blank" style="color: inherit; text-decoration:none;">WhatsApp</a>';
 
 // Replace Theme Variables
 $headerHtml = $theme ? $theme->header_html : '<header><h1>{{clinic_name}}</h1><nav>{{navigation}}</nav></header>';
 $footerHtml = $theme ? $theme->footer_html : '<footer><p>&copy; {{year}} {{clinic_name}}</p>{{social_links}}</footer>';
 
+$logoHtml = '';
+if (!empty($profile->logo_url)) {
+    $logoHtml = '<img src="' . URL_ROOT . Security::escape($profile->logo_url) . '" alt="Logo" style="max-height: 60px; border-radius: 8px;">';
+}
+
 $replacements = [
     '{{clinic_name}}' => Security::escape($profile->clinic_name),
     '{{navigation}}' => $navHtml,
     '{{social_links}}' => $socialHtml,
+    '{{logo}}' => $logoHtml,
     '{{year}}' => date('Y')
 ];
 
@@ -35,7 +42,7 @@ $headerHtml = str_replace(array_keys($replacements), array_values($replacements)
 $footerHtml = str_replace(array_keys($replacements), array_values($replacements), $footerHtml);
 
 // Inject Custom Primary Color into CSS vars if theme provides it, or append to head
-$cssVars = $theme ? $theme->css_variables : ':root { --primary-color: #333; }';
+$cssVars = $theme ? $theme->css_variables : ':root { --primary-color: #4F46E5; --bg-color: #F3F4F6; --text-color: #1F2937; }';
 // Overwrite theme primary color with user selected color
 $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color: ' . Security::escape($profile->primary_color) . ';', $cssVars);
 ?>
@@ -56,6 +63,9 @@ $cssVars = preg_replace('/--primary-color:\s*#[a-zA-Z0-9]+;/', '--primary-color:
         <meta property="og:image" content="<?= URL_ROOT . Security::escape($data['og_image']) ?>">
     <?php endif; ?>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
 
     <!-- Schema.org JSON-LD Structured Data for Local Business / Physician -->

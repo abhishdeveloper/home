@@ -1,4 +1,4 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <div class="card" style="text-align: center;">
     <h1 style="color: #007bff;">Simple, Transparent Pricing</h1>
@@ -37,4 +37,4 @@
     </div>
 </div>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

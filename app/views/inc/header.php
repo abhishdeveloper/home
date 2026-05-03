@@ -18,33 +18,118 @@
         <meta property="og:image" content="<?= URL_ROOT . Security::escape($data['og_image']) ?>">
     <?php endif; ?>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --secondary: #10B981;
+            --secondary-hover: #059669;
+            --bg-color: #F3F4F6;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --white: #FFFFFF;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * { box-sizing: border-box; }
         img { max-width: 100%; height: auto; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f4f7f6; color: #333; line-height: 1.6; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* Navbar */
-        .navbar { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;}
-        .navbar .logo { font-size: 1.5em; font-weight: bold; color: #007bff; text-decoration: none; }
-        .navbar .nav-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .navbar a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.3s;}
-        .navbar a:hover { color: #007bff; }
-        .btn-primary { background: #007bff; color: #fff !important; padding: 8px 20px; border-radius: 20px; }
-        .btn-primary:hover { background: #0056b3; }
-        .btn-outline { border: 1px solid #007bff; color: #007bff !important; padding: 8px 20px; border-radius: 20px; }
-        .btn-outline:hover { background: #007bff; color: #fff !important; }
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.6s ease-out forwards; }
+
+        /* Navbar - Glassmorphism */
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding: 15px 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 1.6em; font-weight: 700; color: var(--primary);
+            text-decoration: none; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .navbar .nav-links { display: flex; gap: 25px; align-items: center; flex-wrap: wrap; }
+        .navbar a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: var(--transition);}
+        .navbar a:hover { color: var(--primary); }
+
+        /* Global Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #8B5CF6);
+            color: var(--white) !important;
+            padding: 10px 24px; border-radius: 9999px;
+            font-weight: 500; border: none; cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+            transition: var(--transition);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+        .btn-outline {
+            border: 2px solid var(--primary); color: var(--primary) !important;
+            padding: 8px 24px; border-radius: 9999px; font-weight: 500;
+            background: transparent; transition: var(--transition); cursor: pointer;
+        }
+        .btn-outline:hover {
+            background: var(--primary); color: var(--white) !important;
+            transform: translateY(-2px);
+        }
 
         /* General Container */
-        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 60vh;}
+        .main-container { max-width: 1200px; margin: 50px auto; padding: 0 20px; min-height: 65vh; animation: fadeUp 0.5s ease-out;}
 
         /* Cards */
-        .card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;}
+        .card {
+            background: var(--white); padding: 30px; border-radius: 16px;
+            box-shadow: var(--card-shadow); margin-bottom: 25px;
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: var(--transition);
+        }
+        .card.hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Form Elements */
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="tel"], select, textarea {
+            width: 100%; padding: 12px 16px; border: 1px solid #D1D5DB; border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-dark);
+            transition: var(--transition); background: #F9FAFB;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); background: var(--white);
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .navbar { flex-direction: column; gap: 15px; text-align: center; }
-            .navbar .nav-links { justify-content: center; gap: 10px; }
-            .main-container { margin: 20px auto; padding: 0 15px; }
+            .navbar { flex-direction: column; gap: 15px; text-align: center; padding: 20px 5%; }
+            .navbar .nav-links { justify-content: center; gap: 12px; }
+            .main-container { margin: 30px auto; padding: 0 15px; }
         }
     </style>
 </head>

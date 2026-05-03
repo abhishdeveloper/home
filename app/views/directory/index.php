@@ -1,12 +1,13 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <style>
     .alert { padding: 15px; background: #fff3cd; color: #856404; margin-bottom: 20px; border-radius: 4px; border: 1px solid #ffeeba;}
-    .clinic-card { background: #fff; padding: 25px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: center;}
-    .clinic-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #f4f7f6; }
+    .clinic-card { background: var(--white); padding: 30px; margin-bottom: 25px; border-radius: 16px; box-shadow: var(--card-shadow); display: flex; gap: 25px; align-items: center; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02);}
+    .clinic-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+    .clinic-logo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .clinic-info { flex: 1; }
-    .clinic-info h3 { margin: 0 0 5px 0; color: #333; font-size: 1.5em;}
-    .clinic-info p { margin: 3px 0; color: #666; }
+    .clinic-info h3 { margin: 0 0 8px 0; color: var(--text-dark); font-size: 1.6em; font-weight: 700; letter-spacing: -0.5px;}
+    .clinic-info p { margin: 4px 0; color: var(--text-muted); font-size: 1.05em; }
     .clinic-actions { text-align: right; }
     .rating-badge { display: inline-block; background: #fdf2d0; color: #f39c12; padding: 5px 10px; border-radius: 20px; font-weight: bold; margin-bottom: 10px;}
 
@@ -69,4 +70,4 @@
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

@@ -1,4 +1,4 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <div class="card">
     <h1 style="color: #007bff;">Privacy Policy</h1>
@@ -20,4 +20,4 @@
     </div>
 </div>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

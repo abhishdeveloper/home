@@ -1,4 +1,4 @@
-<?php require_once APP_ROOT . '/views/inc/header.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/header.php'; ?>
 
 <div class="card" style="max-width: 800px; margin: 0 auto;">
     <h2 style="color: #17a2b8;">Psychological State Examination</h2>
@@ -29,4 +29,4 @@
     </form>
 </div>
 
-<?php require_once APP_ROOT . '/views/inc/footer.php'; ?>
+<?php require_once APP_ROOT . '/app/views/inc/footer.php'; ?>

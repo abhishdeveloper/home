@@ -15,10 +15,11 @@
         .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .table th, .table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
 
-        .metric-cards { display: flex; gap: 15px; margin-bottom: 20px; }
-        .metric-card { flex: 1; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; min-width: 200px;}
-        .metric-card h3 { margin: 0; font-size: 2em; color: #007bff; }
-        .metric-card p { margin: 5px 0 0 0; color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;}
+        .metric-cards { display: flex; gap: 20px; margin-bottom: 30px; }
+        .metric-card { flex: 1; background: var(--white); padding: 25px; border-radius: 12px; box-shadow: var(--card-shadow); text-align: center; min-width: 200px; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02);}
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .metric-card h3 { margin: 0; font-size: 2.2em; color: var(--primary); font-weight: 700; }
+        .metric-card p { margin: 8px 0 0 0; color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;}
 
         .table-responsive { overflow-x: auto; width: 100%; }
 
