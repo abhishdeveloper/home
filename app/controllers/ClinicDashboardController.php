@@ -169,7 +169,7 @@ class ClinicDashboardController extends Controller {
         $this->view('clinic/createPage', $data);
     }
 
-    public function editPage($id) {
+    public function editPage($id = null) { if (!$id) { header("Location: " . URL_ROOT . "/clinicDashboard"); return; }
         $profile = $this->clinicModel->getProfileByUserId(Session::get('user_id'));
         $page = $this->clinicModel->getPageById($id);
 
@@ -232,7 +232,7 @@ class ClinicDashboardController extends Controller {
         $this->view('clinic/editPage', $data);
     }
 
-    public function deletePage($id) {
+    public function deletePage($id = null) { if (!$id) { header("Location: " . URL_ROOT . "/clinicDashboard"); return; }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
                 die('CSRF Token Validation Failed');
